@@ -32,7 +32,7 @@ import { Game } from "./snake/Game";
         ctx.clearRect(0, 0, width, height);
 
         ctx.fillStyle = "#f2f2f2";
-        game.snake.cells.forEach(cell => {
+        game.snake.forEach(cell => {
             ctx.fillRect(
                 cell.x * cellSize,
                 cell.y * cellSize,

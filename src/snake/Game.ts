@@ -11,17 +11,17 @@ export class Game {
 
         const snake = new Snake();
         for (let i = 0; i < length; i++) {
-            snake.cells.push(new Cell(x - i, y));
+            snake.push(new Cell(x - i, y));
         }
 
         return snake;
     }
 
     public advanceSnake(snake: Snake) {
-        const head = snake.cells.pop();
+        const head = snake.pop();
         if (head !== undefined) {
-            head.x = snake.cells[0].x;
-            head.y = snake.cells[0].y;
+            head.x = snake[0].x;
+            head.y = snake[0].y;
 
             switch (snake.direction) {
                 case Direction.up:
@@ -44,7 +44,7 @@ export class Game {
             if (head.x > this.cols - 1) head.x = 0;
             if (head.y > this.rows - 1) head.y = 0;
 
-            snake.cells.unshift(head);
+            snake.unshift(head);
         }
     }
 
@@ -53,9 +53,8 @@ export class Game {
     }
 }
 
-export class Snake {
+export class Snake extends Array<Cell> {
     public direction = Direction.right;
-    public cells = new Array<Cell>();
 }
 
 export class Cell {
