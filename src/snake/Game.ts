@@ -5,7 +5,7 @@ export class Game {
     public snake = this.createSnake();
 
     public createSnake() {
-        const length = 8;
+        const length = 20;
         const x = Math.floor(this.cols * 0.5) - Math.floor(length * 0.5);
         const y = Math.floor(this.rows * 0.5);
 
@@ -17,7 +17,26 @@ export class Game {
         return snake;
     }
 
+    public isValidDirection(direction?: Direction): boolean {
+        switch (direction) {
+            case Direction.up:
+                return this.snake.direction !== Direction.down;
+            case Direction.down:
+                return this.snake.direction !== Direction.up;
+            case Direction.left:
+                return this.snake.direction !== Direction.right;
+            case Direction.right:
+                return this.snake.direction !== Direction.left;
+            default:
+                return false;
+        }
+    }
+
     public advanceSnake(snake: Snake) {
+        if (this.isValidDirection(snake.input)) {
+            snake.direction = snake.input;
+        }
+
         const head = snake.pop();
         if (head !== undefined) {
             head.x = snake[0].x;
@@ -55,6 +74,7 @@ export class Game {
 
 export class Snake extends Array<Cell> {
     public direction = Direction.right;
+    public input = Direction.right;
 }
 
 export class Cell {
