@@ -97,7 +97,7 @@ export class Game {
         });
 
         // Check food collision
-        const ateFood = this.food.find((food, index) => {
+        const ateFood = this.food.some((food, index) => {
             const collision = food.x === head.x && food.y === head.y;
             if (collision) {
                 this.food.splice(index, 1);
