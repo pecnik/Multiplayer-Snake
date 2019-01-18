@@ -5,14 +5,6 @@ export class Game {
     public readonly snake = this.newSnake();
     public readonly food = new Array<Cell>();
 
-    public newFoodCell(x: number, y: number) {
-        return new Cell(CellType.Food, x, y);
-    }
-
-    public newSnakeCell(x: number, y: number) {
-        return new Cell(CellType.Snake, x, y);
-    }
-
     public newSnake() {
         const length = 3;
         const x = Math.floor(this.cols * 0.5) - Math.floor(length * 0.5);
@@ -25,6 +17,14 @@ export class Game {
         }
 
         return snake;
+    }
+
+    public newFoodCell(x: number, y: number) {
+        return new Cell(CellType.Food, x, y);
+    }
+
+    public newSnakeCell(x: number, y: number) {
+        return new Cell(CellType.Snake, x, y);
     }
 
     public isCellEmpty(x: number, y: number): boolean {
@@ -56,13 +56,7 @@ export class Game {
         }
     }
 
-    public update() {
-        // Apply direction input
-        if (this.hasValidInput(this.snake)) {
-            this.snake.direction = this.snake.input;
-        }
-
-        // Get next snake-head
+    public getNextSnakeHead() {
         const head = this.newSnakeCell(this.snake[0].x, this.snake[0].y);
         switch (this.snake.direction) {
             case Direction.up:
@@ -85,21 +79,29 @@ export class Game {
         if (head.x > this.cols - 1) head.x = 0;
         if (head.y > this.rows - 1) head.y = 0;
 
+        return head;
+    }
+
+    public update() {
+        // Apply direction input
+        if (this.hasValidInput(this.snake)) {
+            this.snake.direction = this.snake.input;
+        }
+
+        // Get next snake-head
+        const head = this.getNextSnakeHead();
+        this.snake.unshift(head);
+        this.snake.pop();
+
         // Check food collision
-        const foodCollision = this.food.some((food, index) => {
+        this.food.some((food, index) => {
             const collision = food.x === head.x && food.y === head.y;
             if (collision) {
                 this.food.splice(index, 1);
+                this.snake.unshift(this.getNextSnakeHead());
             }
             return collision;
         });
-
-        if (foodCollision) {
-            this.snake.unshift(head);
-        } else {
-            this.snake.unshift(head);
-            this.snake.pop();
-        }
 
         // Spawn new food
         if (this.food.length < 3) {
