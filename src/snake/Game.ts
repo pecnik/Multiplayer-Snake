@@ -2,8 +2,8 @@ export class Game {
     public readonly rows = 32;
     public readonly cols = 32;
 
-    public readonly snake = this.newSnake();
-    public readonly food = new Array<Cell>();
+    public snake = this.newSnake();
+    public food = new Array<Cell>();
 
     public newSnake() {
         const length = 3;
@@ -90,18 +90,30 @@ export class Game {
 
         // Get next snake-head
         const head = this.getNextSnakeHead();
-        this.snake.unshift(head);
-        this.snake.pop();
+
+        // Check snake collision
+        const ateBody = this.snake.find(cell => {
+            return cell.x === head.x && cell.y === head.y;
+        });
 
         // Check food collision
-        this.food.some((food, index) => {
+        const ateFood = this.food.find((food, index) => {
             const collision = food.x === head.x && food.y === head.y;
             if (collision) {
                 this.food.splice(index, 1);
-                this.snake.unshift(this.getNextSnakeHead());
             }
             return collision;
         });
+
+        if (ateBody) {
+            this.snake = this.newSnake();
+            this.food = [];
+        } else if (ateFood) {
+            this.snake.unshift(head);
+        } else {
+            this.snake.unshift(head);
+            this.snake.pop();
+        }
 
         // Spawn new food
         if (this.food.length < 3) {
