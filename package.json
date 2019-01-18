@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel ./src/index.html --no-hmr"
+    "dev": "parcel ./src/index.html --no-hmr --port 8080"
   },
   "keywords": [],
   "author": "",
