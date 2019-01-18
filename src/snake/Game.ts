@@ -17,8 +17,8 @@ export class Game {
         return snake;
     }
 
-    public isValidDirection(direction?: Direction): boolean {
-        switch (direction) {
+    public hasValidInput(snake: Snake): boolean {
+        switch (snake.input) {
             case Direction.up:
                 return this.snake.direction !== Direction.down;
             case Direction.down:
@@ -33,7 +33,7 @@ export class Game {
     }
 
     public advanceSnake(snake: Snake) {
-        if (this.isValidDirection(snake.input)) {
+        if (this.hasValidInput(snake)) {
             snake.direction = snake.input;
         }
 
