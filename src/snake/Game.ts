@@ -1,20 +1,44 @@
 export class Game {
-    public rows = 64;
-    public cols = 64;
+    public readonly rows = 32;
+    public readonly cols = 32;
 
-    public snake = this.createSnake();
+    public readonly snake = this.newSnake();
+    public readonly food = new Array<Cell>();
 
-    public createSnake() {
-        const length = 20;
+    public newFoodCell(x: number, y: number) {
+        return new Cell(CellType.Food, x, y);
+    }
+
+    public newSnakeCell(x: number, y: number) {
+        return new Cell(CellType.Snake, x, y);
+    }
+
+    public newSnake() {
+        const length = 3;
         const x = Math.floor(this.cols * 0.5) - Math.floor(length * 0.5);
         const y = Math.floor(this.rows * 0.5);
 
         const snake = new Snake();
+        snake.direction = Direction.right;
         for (let i = 0; i < length; i++) {
-            snake.push(new Cell(x - i, y));
+            snake.push(this.newSnakeCell(x - i, y));
         }
 
         return snake;
+    }
+
+    public isCellEmpty(x: number, y: number): boolean {
+        for (let i = 0; i < this.snake.length; i++) {
+            const cell = this.snake[i];
+            if (cell.x === x && cell.y === y) return false;
+        }
+
+        for (let i = 0; i < this.food.length; i++) {
+            const food = this.food[i];
+            if (food.x === x && food.y === y) return false;
+        }
+
+        return true;
     }
 
     public hasValidInput(snake: Snake): boolean {
@@ -32,57 +56,59 @@ export class Game {
         }
     }
 
-    public advanceSnake(snake: Snake) {
-        if (this.hasValidInput(snake)) {
-            snake.direction = snake.input;
-        }
-
-        const head = snake.pop();
-        if (head !== undefined) {
-            head.x = snake[0].x;
-            head.y = snake[0].y;
-
-            switch (snake.direction) {
-                case Direction.up:
-                    head.y--;
-                    break;
-                case Direction.down:
-                    head.y++;
-                    break;
-                case Direction.left:
-                    head.x--;
-                    break;
-                case Direction.right:
-                    head.x++;
-                    break;
-            }
-
-            if (head.x < 0) head.x = this.cols - 1;
-            if (head.y < 0) head.y = this.rows - 1;
-
-            if (head.x > this.cols - 1) head.x = 0;
-            if (head.y > this.rows - 1) head.y = 0;
-
-            snake.unshift(head);
-        }
-    }
-
     public update() {
-        this.advanceSnake(this.snake);
-    }
-}
+        // Apply direction input
+        if (this.hasValidInput(this.snake)) {
+            this.snake.direction = this.snake.input;
+        }
 
-export class Snake extends Array<Cell> {
-    public direction = Direction.right;
-    public input = Direction.right;
-}
+        // Get next snake-head
+        const head = this.newSnakeCell(this.snake[0].x, this.snake[0].y);
+        switch (this.snake.direction) {
+            case Direction.up:
+                head.y--;
+                break;
+            case Direction.down:
+                head.y++;
+                break;
+            case Direction.left:
+                head.x--;
+                break;
+            case Direction.right:
+                head.x++;
+                break;
+        }
 
-export class Cell {
-    public x: number;
-    public y: number;
-    public constructor(x = 0, y = 0) {
-        this.x = x;
-        this.y = y;
+        // Loop through map
+        if (head.x < 0) head.x = this.cols - 1;
+        if (head.y < 0) head.y = this.rows - 1;
+        if (head.x > this.cols - 1) head.x = 0;
+        if (head.y > this.rows - 1) head.y = 0;
+
+        // Check food collision
+        const foodCollision = this.food.some((food, index) => {
+            const collision = food.x === head.x && food.y === head.y;
+            if (collision) {
+                this.food.splice(index, 1);
+            }
+            return collision;
+        });
+
+        if (foodCollision) {
+            this.snake.unshift(head);
+        } else {
+            this.snake.unshift(head);
+            this.snake.pop();
+        }
+
+        // Spawn new food
+        if (this.food.length < 3) {
+            const x = Math.floor(Math.random() * this.cols);
+            const y = Math.floor(Math.random() * this.rows);
+            if (this.isCellEmpty(x, y)) {
+                this.food.push(this.newFoodCell(x, y));
+            }
+        }
     }
 }
 
@@ -91,4 +117,25 @@ export enum Direction {
     down,
     left,
     right
+}
+
+export enum CellType {
+    Snake,
+    Food
+}
+
+export class Cell {
+    public type: CellType;
+    public x: number;
+    public y: number;
+    public constructor(type = CellType.Food, x = 0, y = 0) {
+        this.type = type;
+        this.x = x;
+        this.y = y;
+    }
+}
+
+export class Snake extends Array<Cell> {
+    public direction = Direction.right;
+    public input = Direction.right;
 }

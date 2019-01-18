@@ -6,7 +6,8 @@ import { Keys } from "./snake/Keys";
 
     const game = new Game();
 
-    const CELL = 8;
+    const CELL = 16;
+    const PADD = 2;
     const WIDTH = game.cols * CELL;
     const HEIGHT = game.rows * CELL;
 
@@ -43,15 +44,29 @@ import { Keys } from "./snake/Keys";
     setInterval(() => {
         game.update();
         requestAnimationFrame(render);
-    }, 1000 / 10);
+    }, 1000 / 5);
 
     function render() {
         const ctx = buffer.getContext("2d");
         if (ctx !== null) {
             ctx.clearRect(0, 0, WIDTH, HEIGHT);
-            ctx.fillStyle = "#f2f2f2";
+            ctx.fillStyle = "#999";
             game.snake.forEach(cell => {
-                ctx.fillRect(cell.x * CELL, cell.y * CELL, CELL, CELL);
+                ctx.fillRect(
+                    cell.x * CELL,
+                    cell.y * CELL,
+                    CELL - PADD,
+                    CELL - PADD
+                );
+            });
+
+            game.food.forEach(cell => {
+                ctx.fillRect(
+                    cell.x * CELL,
+                    cell.y * CELL,
+                    CELL - PADD,
+                    CELL - PADD
+                );
             });
         }
 
