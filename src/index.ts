@@ -23,7 +23,7 @@ import { Game } from "./snake/Game";
     setInterval(() => {
         game.update();
         requestAnimationFrame(render);
-    }, 1000 / 2);
+    }, 1000 / 10);
 
     function render() {
         const ctx = buffer.getContext("2d");

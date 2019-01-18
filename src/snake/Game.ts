@@ -38,6 +38,12 @@ export class Game {
                     break;
             }
 
+            if (head.x < 0) head.x = this.cols - 1;
+            if (head.y < 0) head.y = this.rows - 1;
+
+            if (head.x > this.cols - 1) head.x = 0;
+            if (head.y > this.rows - 1) head.y = 0;
+
             snake.cells.unshift(head);
         }
     }
