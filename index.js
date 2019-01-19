@@ -11,7 +11,7 @@ const env = process.env.NODE_ENV.trim();
 if (env === "development") {
     const path = require("path");
     const Bundler = require("parcel-bundler");
-    const entryFile = path.join(__dirname, "./src/index.html");
+    const entryFile = path.join(__dirname, "./src/app/index.html");
 
     // @ts-ignore
     const bundler = new Bundler(entryFile, { hmr: false });

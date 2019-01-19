@@ -1,9 +1,9 @@
-import { State } from "./game/data/State";
-import { Keys } from "./game/data/Keys";
-import { Direction } from "./game/data/Types";
-import { update } from "./game/Update";
-import { dispatch } from "./game/Dispatch";
-import { Action } from "./game/Actions";
+import { State } from "../game/data/State";
+import { Keys } from "../game/data/Keys";
+import { Direction } from "../game/data/Types";
+import { update } from "../game/Update";
+import { dispatch } from "../game/Dispatch";
+import { Action } from "../game/Actions";
 
 {
     "use strict";
