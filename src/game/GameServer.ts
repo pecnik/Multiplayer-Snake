@@ -8,17 +8,18 @@ import {
     snakeAdvanceSystem,
     sankeFoodSystem,
     foodSpawnSystem,
-    snakeDeathSystem
+    snakeDeathSystem,
+    gameSessionSystem
 } from "./Systems";
-import { Cell } from "./data/Cell";
-import { CellType } from "./data/CellType";
 import { Direction } from "./data/Direction";
-import { Snake } from "./data/Snake";
+import { Player } from "./data/Player";
+import { uniqueId } from "lodash";
 
 export function GameServer(io: SocketIO.Server) {
     const state = new State();
     const udpates = new Array<Action>();
     const systems = new Array<System>(
+        gameSessionSystem,
         snakeInputSystem,
         snakeAdvanceSystem,
         sankeFoodSystem,
@@ -27,15 +28,24 @@ export function GameServer(io: SocketIO.Server) {
     );
 
     io.on("connection", socket => {
-        udpates.push(new Action.ADD_SNAKE(newSnake(socket.id)));
-        console.log("New snake: ", socket.id);
+        {
+            // Add player to game
+            const player = new Player(socket.id, `Player-${uniqueId()}`);
+            udpates.push(new Action.ADD_PLAYER(player));
+            console.log("New player: ", player.name);
+        }
 
         socket.emit("sync-state", state);
+
         socket.on("input", (input: Direction) => {
             const snake = state.snakes.find(snake => snake.id === socket.id);
             if (snake !== undefined && Direction[input] !== undefined) {
                 snake.input = input;
             }
+        });
+
+        socket.on("disconnect", () => {
+            udpates.push(new Action.REMOVE_PLAYER(socket.id));
         });
     });
 
@@ -51,18 +61,4 @@ export function GameServer(io: SocketIO.Server) {
         io.sockets.emit("tick", [...udpates]);
         udpates.splice(0, udpates.length);
     }, 1000 / 10);
-
-    function newSnake(snakeId: string) {
-        const length = 3;
-        const x = Math.floor(state.cols * 0.5) - Math.floor(length * 0.5);
-        const y = Math.floor(state.rows * 0.5);
-
-        const snake = new Snake(snakeId);
-        snake.dir = Direction.right;
-        for (let i = 0; i < length; i++) {
-            snake.cells.push(new Cell(CellType.Snake, x - i, y));
-        }
-
-        return snake;
-    }
 }
