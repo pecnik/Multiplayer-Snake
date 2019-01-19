@@ -53,6 +53,17 @@ export function GameClient($el: HTMLElement) {
     });
 
     function render() {
+        if (game.freezeScreen.timer > 0) {
+            const screen = cavnas.getContext("2d");
+            if (screen !== null) {
+                screen.clearRect(0, 0, WIDTH, HEIGHT);
+                if (game.freezeScreen.timer % 2 === 0) {
+                    screen.drawImage(buffer, 0, 0);
+                }
+            }
+            return;
+        }
+
         const ctx = buffer.getContext("2d");
         if (ctx !== null) {
             ctx.clearRect(0, 0, WIDTH, HEIGHT);

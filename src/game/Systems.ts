@@ -156,7 +156,8 @@ export function snakeDeathSystem(state: State, dispatcher: Action[]) {
         });
 
         if (collision) {
-            dispatcher.push(new Action.REMOVE_SNAKE(snake.id));
+            const actions = [new Action.REMOVE_SNAKE(snake.id)];
+            dispatcher.push(new Action.FREEZE_SCREEN(10, actions));
         }
     });
 }
