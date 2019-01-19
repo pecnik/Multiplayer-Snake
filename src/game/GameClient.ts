@@ -1,6 +1,6 @@
 import SocketIOClient from "socket.io-client";
 import { State } from "./data/State";
-import { Direction } from "./data/Types";
+import { Direction } from "./data/Direction";
 import { Keys } from "./data/Keys";
 import { Action } from "./Actions";
 import { dispatch } from "./Dispatch";

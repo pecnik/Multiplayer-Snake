@@ -10,7 +10,9 @@ import {
     foodSpawnSystem,
     snakeDeathSystem
 } from "./Systems";
-import { Direction, Cell, CellType } from "./data/Types";
+import { Cell } from "./data/Cell";
+import { CellType } from "./data/CellType";
+import { Direction } from "./data/Direction";
 import { Snake } from "./data/Snake";
 
 export function GameServer(io: SocketIO.Server) {
@@ -48,7 +50,7 @@ export function GameServer(io: SocketIO.Server) {
 
         io.sockets.emit("tick", [...udpates]);
         udpates.splice(0, udpates.length);
-    }, 1000 / 5);
+    }, 1000 / 10);
 
     function newSnake(snakeId: string) {
         const length = 3;

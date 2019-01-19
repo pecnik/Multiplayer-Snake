@@ -1,4 +1,5 @@
-import { Direction, Cell } from "./Types";
+import { Cell } from "./Cell";
+import { Direction } from "./Direction";
 
 export class Snake {
     public readonly id: string;

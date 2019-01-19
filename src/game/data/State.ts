@@ -1,4 +1,4 @@
-import { Cell } from "./Types";
+import { Cell } from "./Cell";
 import { Snake } from "./Snake";
 
 export class State {
