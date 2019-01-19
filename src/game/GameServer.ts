@@ -28,14 +28,12 @@ export function GameServer(io: SocketIO.Server) {
     );
 
     io.on("connection", socket => {
-        {
-            // Add player to game
-            const player = new Player(socket.id, `Player-${uniqueId()}`);
+        socket.on("join", (name: string = `Player-${uniqueId()}`) => {
+            const player = new Player(socket.id, name);
             udpates.push(new Action.ADD_PLAYER(player));
+            socket.emit("sync-state", state);
             console.log("New player: ", player.name);
-        }
-
-        socket.emit("sync-state", state);
+        });
 
         socket.on("input", (input: Direction) => {
             const snake = state.snakes.find(snake => snake.id === socket.id);
