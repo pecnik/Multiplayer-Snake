@@ -4,14 +4,22 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "parcel ./src/index.html --no-hmr --port 8080"
+    "build": "parcel build src/app/index.html",
+    "start": "set NODE_ENV=production && ts-node index.js",
+    "dev": "set NODE_ENV=development && ts-node index.js"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/lodash": "^4.14.120",
-    "lodash": "^4.17.11"
+    "@types/socket.io": "^2.1.2",
+    "@types/socket.io-client": "^1.4.32",
+    "express": "^4.16.4",
+    "lodash": "^4.17.11",
+    "parcel-bundler": "^1.11.0",
+    "socket.io": "^2.2.0",
+    "socket.io-client": "^2.2.0"
   },
   "devDependencies": {
     "node-sass": "^4.11.0",
