@@ -13,7 +13,8 @@ export type Action =
     | Action.SET_SNAKE_INPUT
     | Action.SET_SNAKE_DIR
     | Action.ADVANCE_SNAKE_HEAD
-    | Action.REMOVE_SNAKE_TAIL;
+    | Action.REMOVE_SNAKE_TAIL
+    | Action.FREEZE_SCREEN;
 
 export module Action {
     export enum Type {
@@ -26,7 +27,8 @@ export module Action {
         SET_SNAKE_INPUT,
         SET_SNAKE_DIR,
         ADVANCE_SNAKE_HEAD,
-        REMOVE_SNAKE_TAIL
+        REMOVE_SNAKE_TAIL,
+        FREEZE_SCREEN
     }
 
     export interface IAction {
@@ -116,6 +118,16 @@ export module Action {
         public readonly snakeId: string;
         public constructor(snakeId: string) {
             this.snakeId = snakeId;
+        }
+    }
+
+    export class FREEZE_SCREEN implements IAction {
+        public readonly type = Action.Type.FREEZE_SCREEN;
+        public readonly timer: number;
+        public readonly actions: Action[];
+        public constructor(timer: number, actions: Action[]) {
+            this.timer = timer;
+            this.actions = actions;
         }
     }
 }

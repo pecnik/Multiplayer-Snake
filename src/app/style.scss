@@ -3,13 +3,16 @@ body {
     margin: 0;
     padding: 0;
     color: white;
-    background-color: #222;
+    background-color: #1e272e;
 }
 
 #app {
     canvas {
         margin: 32px auto;
         display: block;
-        background: black;
+        background: #b8e994;
+        border: 6px solid #b8e994;
+        border-radius: 8px;
+        overflow: hidden;
     }
 }

@@ -8,7 +8,7 @@ import { dispatch } from "./Dispatch";
 export function GameClient($el: HTMLElement) {
     const game = new State();
 
-    const CELL = 16;
+    const CELL = 12;
     const PADD = 2;
     const WIDTH = game.cols * CELL;
     const HEIGHT = game.rows * CELL;
@@ -53,11 +53,22 @@ export function GameClient($el: HTMLElement) {
     });
 
     function render() {
+        if (game.freezeScreen.timer > 0) {
+            const screen = cavnas.getContext("2d");
+            if (screen !== null) {
+                screen.clearRect(0, 0, WIDTH, HEIGHT);
+                if (game.freezeScreen.timer % 2 === 0) {
+                    screen.drawImage(buffer, 0, 0);
+                }
+            }
+            return;
+        }
+
         const ctx = buffer.getContext("2d");
         if (ctx !== null) {
             ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-            ctx.fillStyle = "#7efff5";
+            ctx.fillStyle = "#60a3bc";
             game.food.forEach(cell => {
                 ctx.fillRect(
                     cell.x * CELL,
@@ -68,7 +79,7 @@ export function GameClient($el: HTMLElement) {
             });
 
             game.snakes.forEach(snake => {
-                ctx.fillStyle = snake.id === socket.id ? "#18dcff" : "#f0932b";
+                ctx.fillStyle = snake.id === socket.id ? "#60a3bc" : "#0a3d62";
                 snake.cells.forEach(cell => {
                     ctx.fillRect(
                         cell.x * CELL,
