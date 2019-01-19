@@ -1,8 +1,7 @@
 import { Action } from "./Actions";
 import { State } from "./data/State";
-import { Direction, Cell } from "./data/Types";
+import { Direction, Cell, CellType } from "./data/Types";
 import { Snake } from "./data/Snake";
-import { CellType } from "../snake/Game";
 
 export interface System {
     (state: State, dispatcher: Action[]): void;
