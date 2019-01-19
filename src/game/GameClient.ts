@@ -57,8 +57,7 @@ export function GameClient($el: HTMLElement) {
         if (ctx !== null) {
             ctx.clearRect(0, 0, WIDTH, HEIGHT);
 
-            ctx.fillStyle = "#999";
-
+            ctx.fillStyle = "#7efff5";
             game.food.forEach(cell => {
                 ctx.fillRect(
                     cell.x * CELL,
@@ -69,6 +68,7 @@ export function GameClient($el: HTMLElement) {
             });
 
             game.snakes.forEach(snake => {
+                ctx.fillStyle = snake.id === socket.id ? "#18dcff" : "#f0932b";
                 snake.cells.forEach(cell => {
                     ctx.fillRect(
                         cell.x * CELL,
