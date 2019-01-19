@@ -35,6 +35,9 @@ export function GameClient($el: HTMLElement) {
         { reconnection: false }
     );
 
+    const name = prompt("Player name:", "Player");
+    socket.emit("join", name);
+
     socket.on("sync-state", (serverState: State) => {
         Object.assign(game, serverState);
         requestAnimationFrame(render);
