@@ -4,6 +4,7 @@ import { Cell } from "./data/Cell";
 import { CellType } from "./data/CellType";
 import { Direction } from "./data/Direction";
 import { Snake } from "./data/Snake";
+import { clamp } from "lodash";
 
 export interface System {
     (state: State, dispatcher: Action[]): void;
@@ -101,8 +102,14 @@ export function sankeFoodSystem(state: State, dispatcher: Action[]) {
 
 export function foodSpawnSystem(state: State, dispatcher: Action[]) {
     if (state.food.length < 3) {
-        const x = Math.floor(Math.random() * state.cols);
-        const y = Math.floor(Math.random() * state.rows);
+        const rand = (max: number) => {
+            const pad = 2;
+            const val = Math.round(Math.random() * max);
+            return clamp(val, pad, max - pad * 2);
+        };
+
+        const x = rand(state.cols);
+        const y = rand(state.rows);
         if (isCellRadiusEmpty(x, y, 5)) {
             const food = new Cell(CellType.Food, x, y);
             dispatcher.push(new Action.ADD_FOOD(food));
