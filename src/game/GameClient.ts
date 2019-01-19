@@ -5,11 +5,13 @@ import { Keys } from "./data/Keys";
 import { Action } from "./Actions";
 import { dispatch } from "./Dispatch";
 import { Cell } from "./data/Cell";
+import { CellType } from "./data/CellType";
 
 export function GameClient($el: HTMLElement) {
     const game = new State();
 
     const CELL = 12;
+    const CELL_SMALL = Math.floor(CELL / 3);
     const SIDE = 200;
     const WORLD_WIDTH = game.cols * CELL;
     const WORLD_HEIGHT = game.rows * CELL;
@@ -81,10 +83,10 @@ export function GameClient($el: HTMLElement) {
             ctx.strokeStyle = LIGHT;
             ctx.strokeRect(1, 1, WORLD_WIDTH - 1, WORLD_HEIGHT - 1);
             ctx.fillStyle = LIGHT;
-            game.food.forEach(cell => fillCell(ctx, cell));
+            game.food.forEach(cell => renderCell(ctx, cell));
             game.snakes.forEach(snake => {
                 ctx.fillStyle = snake.id === socket.id ? DARK : LIGHT;
-                snake.cells.forEach(cell => fillCell(ctx, cell));
+                snake.cells.forEach(cell => renderCell(ctx, cell));
             });
 
             // Draw side board
@@ -110,7 +112,30 @@ export function GameClient($el: HTMLElement) {
         }
     }
 
-    function fillCell(ctx: CanvasRenderingContext2D, cell: Cell) {
-        ctx.fillRect(cell.x * CELL + 2, cell.y * CELL + 2, CELL - 1, CELL - 1);
+    function renderCell(ctx: CanvasRenderingContext2D, cell: Cell) {
+        switch (cell.type) {
+            case CellType.Food:
+                for (let x = 0; x < 3; x++) {
+                    for (let y = 0; y < 3; y++) {
+                        if ((x === 1 && y !== 1) || (x !== 1 && y === 1)) {
+                            ctx.fillRect(
+                                cell.x * CELL + 1 + CELL_SMALL * x,
+                                cell.y * CELL + 1 + CELL_SMALL * y,
+                                CELL_SMALL,
+                                CELL_SMALL
+                            );
+                        }
+                    }
+                }
+                break;
+            default:
+                ctx.fillRect(
+                    cell.x * CELL + 2,
+                    cell.y * CELL + 2,
+                    CELL - 1,
+                    CELL - 1
+                );
+                break;
+        }
     }
 }
