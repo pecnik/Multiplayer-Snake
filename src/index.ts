@@ -1,25 +1,29 @@
-import { Keys } from "./snake/Keys";
-import { Snake } from "./snake/Snake";
+import { State } from "./game/data/State";
+import { Keys } from "./game/data/Keys";
+import { Direction } from "./game/data/Types";
+import { update } from "./game/Update";
+import { dispatch } from "./game/Dispatch";
+import { Action } from "./game/Actions";
 
 {
     "use strict";
 
-    const game = new Snake.GameState();
+    const game = new State();
 
     const CELL = 16;
     const PADD = 2;
     const WIDTH = game.cols * CELL;
     const HEIGHT = game.rows * CELL;
 
-    const KEY_BINDS: { [key: string]: Snake.Direction } = {
-        [Keys.W]: Snake.Direction.up,
-        [Keys.A]: Snake.Direction.left,
-        [Keys.S]: Snake.Direction.down,
-        [Keys.D]: Snake.Direction.right,
-        [Keys.ARROW_UP]: Snake.Direction.up,
-        [Keys.ARROW_LEFT]: Snake.Direction.left,
-        [Keys.ARROW_DOWN]: Snake.Direction.down,
-        [Keys.ARROW_RIGHT]: Snake.Direction.right
+    const KEY_BINDS: { [key: string]: Direction } = {
+        [Keys.W]: Direction.up,
+        [Keys.A]: Direction.left,
+        [Keys.S]: Direction.down,
+        [Keys.D]: Direction.right,
+        [Keys.ARROW_UP]: Direction.up,
+        [Keys.ARROW_LEFT]: Direction.left,
+        [Keys.ARROW_DOWN]: Direction.down,
+        [Keys.ARROW_RIGHT]: Direction.right
     };
 
     const app = document.getElementById("app");
@@ -37,16 +41,15 @@ import { Snake } from "./snake/Snake";
         const direction = KEY_BINDS[ev.keyCode];
         if (direction !== undefined) {
             game.snakes.forEach(snake => {
-                snake.input = direction;
+                dispatch(game, new Action.SET_SNAKE_INPUT(snake.id, direction));
             });
         }
     });
 
     setInterval(() => {
-        const cahnge = Snake.getStateChanges(game);
-        Snake.applyStateChanges(game, cahnge);
+        update(game);
         requestAnimationFrame(render);
-    }, 1000 / 15);
+    }, 1000 / 5);
 
     function render() {
         const ctx = buffer.getContext("2d");
