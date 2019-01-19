@@ -1,13 +1,11 @@
-import { State } from "./game/data/State";
-import { Keys } from "./game/data/Keys";
-import { Direction } from "./game/data/Types";
-import { update } from "./game/Update";
-import { dispatch } from "./game/Dispatch";
-import { Action } from "./game/Actions";
+import SocketIOClient from "socket.io-client";
+import { State } from "./data/State";
+import { Direction } from "./data/Direction";
+import { Keys } from "./data/Keys";
+import { Action } from "./Actions";
+import { dispatch } from "./Dispatch";
 
-{
-    "use strict";
-
+export function GameClient($el: HTMLElement) {
     const game = new State();
 
     const CELL = 16;
@@ -26,30 +24,33 @@ import { Action } from "./game/Actions";
         [Keys.ARROW_RIGHT]: Direction.right
     };
 
-    const app = document.getElementById("app");
-    if (app === null) {
-        throw new Error("Missing #app element");
-    }
-
     const cavnas = document.createElement("canvas");
     const buffer = document.createElement("canvas");
     cavnas.width = buffer.width = WIDTH;
     cavnas.height = buffer.height = HEIGHT;
-    app.appendChild(cavnas);
+    $el.appendChild(cavnas);
+
+    const socket = SocketIOClient.connect(
+        location.href.replace(location.port, "8080"),
+        { reconnection: false }
+    );
+
+    socket.on("sync-state", (serverState: State) => {
+        Object.assign(game, serverState);
+        requestAnimationFrame(render);
+    });
+
+    socket.on("tick", (udpates: Action[]) => {
+        udpates.forEach(action => dispatch(game, action));
+        requestAnimationFrame(render);
+    });
 
     document.addEventListener("keydown", ev => {
         const direction = KEY_BINDS[ev.keyCode];
-        if (direction !== undefined) {
-            game.snakes.forEach(snake => {
-                dispatch(game, new Action.SET_SNAKE_INPUT(snake.id, direction));
-            });
+        if (socket.id !== undefined && direction !== undefined) {
+            socket.emit("input", direction);
         }
     });
-
-    setInterval(() => {
-        update(game);
-        requestAnimationFrame(render);
-    }, 1000 / 5);
 
     function render() {
         const ctx = buffer.getContext("2d");

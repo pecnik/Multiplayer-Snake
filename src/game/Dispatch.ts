@@ -12,6 +12,7 @@ export function dispatch(state: State, action: Action) {
     switch (action.type) {
         case Action.Type.ADD_FOOD: {
             const { food } = action;
+            dispatch(state, new Action.REMOVE_FOOD(food));
             state.food.push(food);
             break;
         }
@@ -26,6 +27,7 @@ export function dispatch(state: State, action: Action) {
 
         case Action.Type.ADD_SNAKE: {
             const { snake } = action;
+            dispatch(state, new Action.REMOVE_SNAKE(snake.id));
             state.snakes.push(snake);
             break;
         }

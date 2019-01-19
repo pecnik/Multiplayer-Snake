@@ -1,6 +1,6 @@
 import { Snake } from "./data/Snake";
-import { Direction } from "../snake/Game";
-import { Cell } from "./data/Types";
+import { Cell } from "./data/Cell";
+import { Direction } from "./data/Direction";
 
 export type Action =
     | Action.ADD_FOOD

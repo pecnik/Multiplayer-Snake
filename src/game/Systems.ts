@@ -1,7 +1,8 @@
 import { Action } from "./Actions";
 import { State } from "./data/State";
-import { Direction, Cell, CellType } from "./data/Types";
-import { Snake } from "./data/Snake";
+import { Cell } from "./data/Cell";
+import { CellType } from "./data/CellType";
+import { Direction } from "./data/Direction";
 
 export interface System {
     (state: State, dispatcher: Action[]): void;
@@ -57,22 +58,6 @@ export function sankeFoodSystem(state: State, dispatcher: Action[]) {
             dispatcher.push(new Action.REMOVE_SNAKE_TAIL(snake.id));
         }
     });
-}
-
-export function snakeSpawnSystem(state: State, dispatcher: Action[]) {
-    if (state.snakes.length < 1) {
-        const length = 3;
-        const x = Math.floor(state.cols * 0.5) - Math.floor(length * 0.5);
-        const y = Math.floor(state.rows * 0.5);
-
-        const snake = new Snake("snake");
-        snake.dir = Direction.right;
-        for (let i = 0; i < length; i++) {
-            snake.cells.push(new Cell(CellType.Snake, x - i, y));
-        }
-
-        dispatcher.push(new Action.ADD_SNAKE(snake));
-    }
 }
 
 export function foodSpawnSystem(state: State, dispatcher: Action[]) {
