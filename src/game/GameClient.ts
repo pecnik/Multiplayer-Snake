@@ -6,9 +6,11 @@ import { Action } from "./Actions";
 import { dispatch } from "./Dispatch";
 import { Cell } from "./data/Cell";
 import { CellType } from "./data/CellType";
+import { SnakeFSM } from "./data/SnakeFSM";
 
 export function GameClient($el: HTMLElement) {
     const game = new State();
+    let tick = 0;
 
     const CELL = 12;
     const CELL_SMALL = Math.floor(CELL / 3);
@@ -49,6 +51,7 @@ export function GameClient($el: HTMLElement) {
     });
 
     socket.on("tick", (udpates: Action[]) => {
+        tick++;
         udpates.forEach(action => dispatch(game, action));
         requestAnimationFrame(render);
     });
@@ -74,6 +77,10 @@ export function GameClient($el: HTMLElement) {
             ctx.fillStyle = LIGHT;
             game.food.forEach(cell => renderCell(ctx, cell));
             game.snakes.forEach(snake => {
+                if (snake.fsm === SnakeFSM.Dead) return;
+                if (snake.fsm === SnakeFSM.Spawning && tick % 2 === 0) return;
+                if (snake.fsm === SnakeFSM.Despawning && tick % 2 === 0) return;
+
                 ctx.fillStyle = snake.id === socket.id ? DARK : LIGHT;
                 snake.cells.forEach(cell => renderCell(ctx, cell));
             });
