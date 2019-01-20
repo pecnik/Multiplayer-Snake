@@ -3,9 +3,9 @@ import { Cell } from "./data/Cell";
 import { Direction } from "./data/Direction";
 
 export type Action =
-    | Action.ADD_SNAKE
+    | Action.SYNC_SNAKE
     | Action.REMOVE_SNAKE
-    | Action.ADD_FOOD
+    | Action.SYNC_FOOD
     | Action.REMOVE_FOOD
     | Action.SET_SNAKE_INPUT
     | Action.SET_SNAKE_DIR
@@ -14,7 +14,7 @@ export type Action =
 
 export module Action {
     export enum Type {
-        ADD_SNAKE,
+        SYNC_SNAKE,
         REMOVE_SNAKE,
 
         SPAWN_SNAKE,
@@ -25,7 +25,7 @@ export module Action {
         ADVANCE_SNAKE_HEAD,
         REMOVE_SNAKE_TAIL,
 
-        ADD_FOOD,
+        SYNC_FOOD,
         REMOVE_FOOD
     }
 
@@ -33,24 +33,10 @@ export module Action {
         readonly type: Action.Type;
     }
 
-    export class ADD_FOOD implements IAction {
-        public readonly type = Action.Type.ADD_FOOD;
-        public readonly food: Cell;
-        public constructor(food: Cell) {
-            this.food = food;
-        }
-    }
 
-    export class REMOVE_FOOD implements IAction {
-        public readonly type = Action.Type.REMOVE_FOOD;
-        public readonly food: Cell;
-        public constructor(food: Cell) {
-            this.food = food;
-        }
-    }
 
-    export class ADD_SNAKE implements IAction {
-        public readonly type = Action.Type.ADD_SNAKE;
+    export class SYNC_SNAKE implements IAction {
+        public readonly type = Action.Type.SYNC_SNAKE;
         public readonly snake: Snake;
         public constructor(snake: Snake) {
             this.snake = snake;
@@ -100,6 +86,22 @@ export module Action {
         public readonly snakeId: string;
         public constructor(snakeId: string) {
             this.snakeId = snakeId;
+        }
+    }
+
+    export class SYNC_FOOD implements IAction {
+        public readonly type = Action.Type.SYNC_FOOD;
+        public readonly food: Cell;
+        public constructor(food: Cell) {
+            this.food = food;
+        }
+    }
+
+    export class REMOVE_FOOD implements IAction {
+        public readonly type = Action.Type.REMOVE_FOOD;
+        public readonly food: Cell;
+        public constructor(food: Cell) {
+            this.food = food;
         }
     }
 }

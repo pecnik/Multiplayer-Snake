@@ -28,7 +28,7 @@ export function GameServer(io: SocketIO.Server) {
     io.on("connection", socket => {
         socket.on("join", (name: string = `Player-${uniqueId()}`) => {
             const snake = new Snake(socket.id, name);
-            udpates.push(new Action.ADD_SNAKE(snake));
+            udpates.push(new Action.SYNC_SNAKE(snake));
             socket.emit("sync-state", state);
             console.log("New player: ", snake.name);
         });

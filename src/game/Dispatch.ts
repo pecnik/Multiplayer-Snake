@@ -10,38 +10,7 @@ export const undefinedTypeWarning = memoize((action: Action) => {
 
 export function dispatch(state: State, action: Action) {
     switch (action.type) {
-        case Action.Type.ADD_PLAYER: {
-            const { player } = action;
-            dispatch(state, new Action.REMOVE_PLAYER(player.id));
-            state.players.push(player);
-            break;
-        }
-
-        case Action.Type.REMOVE_PLAYER: {
-            const { playerId } = action;
-            dispatch(state, new Action.REMOVE_SNAKE(playerId));
-            state.players = state.players.filter(player => {
-                return player.id !== playerId;
-            });
-            break;
-        }
-
-        case Action.Type.ADD_FOOD: {
-            const { food } = action;
-            dispatch(state, new Action.REMOVE_FOOD(food));
-            state.food.push(food);
-            break;
-        }
-
-        case Action.Type.REMOVE_FOOD: {
-            const { food } = action;
-            state.food = state.food.filter(cell => {
-                return cell.x !== food.x || cell.y !== food.y;
-            });
-            break;
-        }
-
-        case Action.Type.ADD_SNAKE: {
+        case Action.Type.SYNC_SNAKE: {
             const { snake } = action;
             dispatch(state, new Action.REMOVE_SNAKE(snake.id));
             state.snakes.push(snake);
@@ -89,6 +58,21 @@ export function dispatch(state: State, action: Action) {
             if (snake !== undefined) {
                 snake.cells.pop();
             }
+            break;
+        }
+
+        case Action.Type.SYNC_FOOD: {
+            const { food } = action;
+            dispatch(state, new Action.REMOVE_FOOD(food));
+            state.food.push(food);
+            break;
+        }
+
+        case Action.Type.REMOVE_FOOD: {
+            const { food } = action;
+            state.food = state.food.filter(cell => {
+                return cell.x !== food.x || cell.y !== food.y;
+            });
             break;
         }
 

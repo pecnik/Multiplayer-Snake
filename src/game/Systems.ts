@@ -41,7 +41,7 @@ export function snakeSpawnSystem(state: State, dispatcher: Action[]) {
                 snake.dir = Direction.right;
                 snake.input = Direction.right;
                 snake.cells = cells;
-                dispatcher.push(new Action.ADD_SNAKE(snake));
+                dispatcher.push(new Action.SYNC_SNAKE(snake));
                 return;
             }
         }
@@ -53,7 +53,7 @@ export function snakeSpawnSystem(state: State, dispatcher: Action[]) {
         snake.timer--;
         if (snake.timer <= 0) {
             snake.fsm = SnakeFSM.Alive;
-            dispatcher.push(new Action.ADD_SNAKE(snake));
+            dispatcher.push(new Action.SYNC_SNAKE(snake));
         }
     });
 
@@ -61,7 +61,7 @@ export function snakeSpawnSystem(state: State, dispatcher: Action[]) {
         snake.timer--;
         if (snake.timer <= 0) {
             snake.fsm = SnakeFSM.Dead;
-            dispatcher.push(new Action.ADD_SNAKE(snake));
+            dispatcher.push(new Action.SYNC_SNAKE(snake));
         }
     });
 }
@@ -129,7 +129,7 @@ export function snakeCollisionSystem(state: State, dispatcher: Action[]) {
         if (collision) {
             snake.fsm = SnakeFSM.Despawning;
             snake.timer = 10;
-            dispatcher.push(new Action.ADD_SNAKE(snake));
+            dispatcher.push(new Action.SYNC_SNAKE(snake));
         }
     });
 }
@@ -146,7 +146,7 @@ export function foodSpawnSystem(state: State, dispatcher: Action[]) {
         const y = rand(state.rows);
         if (isCellRadiusEmpty(state, x, y, 5)) {
             const food = new Cell(CellType.Food, x, y);
-            dispatcher.push(new Action.ADD_FOOD(food));
+            dispatcher.push(new Action.SYNC_FOOD(food));
         }
     }
 }
