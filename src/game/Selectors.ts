@@ -58,3 +58,32 @@ export function isCellRadiusEmpty(
     }
     return true;
 }
+
+export function getPlayerNameErrors(name: string): string | undefined {
+    if (name.length < 3) {
+        return "Name must contain at least 3 characters.";
+    }
+
+    if (name.length >= 8) {
+        return "Username cannot be longer than 8 characters.";
+    }
+
+    const allowedCharacters = [["A", "Z"], ["a", "z"], ["0", "9"]];
+    const allowedCharactersRange = allowedCharacters.map(range => {
+        return range.map(x => x.charCodeAt(0));
+    });
+
+    for (let i = 0; i < name.length; i++) {
+        const char = name.charCodeAt(i);
+        const valid = allowedCharactersRange.some(range => {
+            const [min, max] = range;
+            return char >= min && char <= max;
+        });
+
+        if (!valid) {
+            return "Names can contain only letters and numbers.";
+        }
+    }
+
+    return;
+}
