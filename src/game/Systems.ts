@@ -7,9 +7,10 @@ import {
     forEachAliveSnake,
     forEachDeadSnake,
     forEachDespawningSnake,
-    forEachSpawningSnake
+    forEachSpawningSnake,
+    isCellRadiusEmpty
 } from "./Selectors";
-import { clamp } from "lodash";
+import { clamp, times } from "lodash";
 import { SnakeFSM } from "./data/SnakeFSM";
 
 export interface System {
@@ -18,22 +19,34 @@ export interface System {
 
 export function snakeSpawnSystem(state: State, dispatcher: Action[]) {
     forEachDeadSnake(state, snake => {
-        snake.fsm = SnakeFSM.Spawning;
-        snake.timer = 10;
-        snake.dir = Direction.right;
-        snake.input = Direction.right;
-        snake.cells = (() => {
-            const cells = new Array<Cell>();
-            const length = 3;
-            const x = Math.floor(state.cols * 0.5) - Math.floor(length * 0.5);
-            const y = Math.floor(state.rows * 0.5);
-            for (let i = 0; i < length; i++) {
-                cells.push(new Cell(CellType.Snake, x - i, y));
-            }
-            return cells;
-        })();
+        const length = 3;
+        const cells = times(length).map(x => new Cell(CellType.Snake, x, 0));
+        const head = cells[0];
+        const tail = cells[2];
 
-        dispatcher.push(new Action.ADD_SNAKE(snake));
+        const pad = length * 2;
+        for (let x = pad; x < state.cols - pad; x++) {
+            for (let y = pad; y < state.rows - pad; y++) {
+                cells.forEach((cell, i) => {
+                    cell.x = x - i;
+                    cell.y = y;
+                });
+
+                if (!isCellRadiusEmpty(state, head.x, head.y, length)) continue;
+                if (!isCellRadiusEmpty(state, tail.x, tail.y, length)) continue;
+
+                // Find safe spot to spawn snake
+                snake.fsm = SnakeFSM.Spawning;
+                snake.timer = 10;
+                snake.dir = Direction.right;
+                snake.input = Direction.right;
+                snake.cells = cells;
+                dispatcher.push(new Action.ADD_SNAKE(snake));
+                return;
+            }
+        }
+
+        console.warn(`Couldn't find safe spawn point for ${snake.name}`);
     });
 
     forEachSpawningSnake(state, snake => {
@@ -131,42 +144,9 @@ export function foodSpawnSystem(state: State, dispatcher: Action[]) {
 
         const x = rand(state.cols);
         const y = rand(state.rows);
-        if (isCellRadiusEmpty(x, y, 5)) {
+        if (isCellRadiusEmpty(state, x, y, 5)) {
             const food = new Cell(CellType.Food, x, y);
             dispatcher.push(new Action.ADD_FOOD(food));
         }
-    }
-
-    function isCellEmpty(x: number, y: number): boolean {
-        for (let i = 0; i < state.snakes.length; i++) {
-            const snake = state.snakes[i];
-            for (let j = 0; j < snake.cells.length; j++) {
-                const cell = snake.cells[j];
-                if (cell.x === x && cell.y === y) return false;
-            }
-        }
-
-        for (let i = 0; i < state.food.length; i++) {
-            const food = state.food[i];
-            if (food.x === x && food.y === y) return false;
-        }
-
-        return true;
-    }
-
-    function isCellRadiusEmpty(x: number, y: number, radius: number): boolean {
-        const x1 = x - radius;
-        const x2 = x + radius;
-        const y1 = y - radius;
-        const y2 = y + radius;
-
-        for (let x = x1; x <= x2; x++) {
-            for (let y = y1; y <= y2; y++) {
-                if (!isCellEmpty(x, y)) {
-                    return false;
-                }
-            }
-        }
-        return true;
     }
 }
