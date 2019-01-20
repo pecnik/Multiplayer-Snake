@@ -3,6 +3,7 @@ import { State } from "./data/State";
 import { Cell } from "./data/Cell";
 import { CellType } from "./data/CellType";
 import { Direction } from "./data/Direction";
+import { forEachAliveSnake } from "./Selectors";
 import { clamp } from "lodash";
 
 export interface System {
@@ -10,7 +11,7 @@ export interface System {
 }
 
 export function snakeInputSystem(state: State, dispatcher: Action[]) {
-    state.snakes.forEach(snake => {
+    forEachAliveSnake(state, snake => {
         const { input, dir } = snake;
         if (input === Direction.up && dir === Direction.down) return;
         if (input === Direction.down && dir === Direction.up) return;
@@ -21,7 +22,7 @@ export function snakeInputSystem(state: State, dispatcher: Action[]) {
 }
 
 export function snakeAdvanceSystem(state: State, dispatcher: Action[]) {
-    state.snakes.forEach(snake => {
+    forEachAliveSnake(state, snake => {
         const dy =
             (snake.dir === Direction.up ? -1 : 0) +
             (snake.dir === Direction.down ? 1 : 0);
@@ -42,21 +43,35 @@ export function snakeAdvanceSystem(state: State, dispatcher: Action[]) {
         if (head.x > state.cols - 1) head.x = 0;
         if (head.y > state.rows - 1) head.y = 0;
 
-        dispatcher.push(new Action.ADVANCE_SNAKE_HEAD(snake.id, head));
-    });
-}
-
-export function sankeFoodSystem(state: State, dispatcher: Action[]) {
-    state.snakes.forEach(snake => {
-        const [head] = snake.cells;
+        // Check is snake ate food
         const food = state.food.find(food => {
             return food.x === head.x && food.y === head.y;
         });
 
         if (food !== undefined) {
             dispatcher.push(new Action.REMOVE_FOOD(food));
+            dispatcher.push(new Action.ADVANCE_SNAKE_HEAD(snake.id, head));
         } else {
             dispatcher.push(new Action.REMOVE_SNAKE_TAIL(snake.id));
+            dispatcher.push(new Action.ADVANCE_SNAKE_HEAD(snake.id, head));
+        }
+    });
+}
+
+export function snakeCollisionSystem(state: State, dispatcher: Action[]) {
+    forEachAliveSnake(state, snake => {
+        const [head] = snake.cells;
+        const collision = state.snakes.some(snake => {
+            return snake.cells.some(cell => {
+                if (head === cell) return false;
+                if (head.x !== cell.x) return false;
+                if (head.y !== cell.y) return false;
+                return true;
+            });
+        });
+
+        if (collision) {
+            dispatcher.push(new Action.REMOVE_SNAKE(snake.id));
         }
     });
 }
@@ -109,22 +124,4 @@ export function foodSpawnSystem(state: State, dispatcher: Action[]) {
         }
         return true;
     }
-}
-
-export function snakeDeathSystem(state: State, dispatcher: Action[]) {
-    state.snakes.forEach(snake => {
-        const [head] = snake.cells;
-        const collision = state.snakes.some(snake => {
-            return snake.cells.some(cell => {
-                if (head === cell) return false;
-                if (head.x !== cell.x) return false;
-                if (head.y !== cell.y) return false;
-                return true;
-            });
-        });
-
-        if (collision) {
-            dispatcher.push(new Action.REMOVE_SNAKE(snake.id));
-        }
-    });
 }

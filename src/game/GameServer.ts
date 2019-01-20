@@ -9,9 +9,8 @@ import {
     System,
     snakeInputSystem,
     snakeAdvanceSystem,
-    sankeFoodSystem,
     foodSpawnSystem,
-    snakeDeathSystem
+    snakeCollisionSystem
 } from "./Systems";
 
 export function GameServer(io: SocketIO.Server) {
@@ -20,9 +19,8 @@ export function GameServer(io: SocketIO.Server) {
     const systems = new Array<System>(
         snakeInputSystem,
         snakeAdvanceSystem,
-        sankeFoodSystem,
-        foodSpawnSystem,
-        snakeDeathSystem
+        snakeCollisionSystem,
+        foodSpawnSystem
     );
 
     io.on("connection", socket => {
