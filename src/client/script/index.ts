@@ -111,10 +111,13 @@ login().then(socket => {
             game.snakes.forEach((snake, index) => {
                 const x = 16;
                 const y = 80 + 16 * index;
-                const score = snake === undefined ? "X" : snake.score;
-                const text = `${index + 1}. ${snake.name}: ${score}`;
                 ctx.fillStyle = snake.id === socket.id ? DARK : LIGHT;
-                ctx.fillText(text, x, y);
+
+                ctx.textAlign = "left";
+                ctx.fillText(`${index + 1}. ${snake.name}`, x, y);
+
+                ctx.textAlign = "right";
+                ctx.fillText(snake.score.toString(), SIDE - 16, y);
             });
             ctx.translate(-WORLD_WIDTH, 0);
         }
