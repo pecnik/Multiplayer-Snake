@@ -1,10 +1,16 @@
+import SocketIOClient from "socket.io-client";
 import { GameClient } from "../game/GameClient";
 import { getPlayerNameErrors } from "../game/Selectors";
 import { debounce } from "lodash";
 
-getPlayerName().then(startGame);
+const socket = SocketIOClient.connect(
+    location.href.replace(location.port, "8080"),
+    { reconnection: false }
+);
 
-function getPlayerName() {
+login().then(startGame);
+
+function login() {
     return new Promise(resolve => {
         const $form = document.querySelector("#login") as HTMLElement;
         const $input = document.querySelector("#input") as HTMLInputElement;
@@ -32,11 +38,19 @@ function getPlayerName() {
                 return;
             }
 
+            socket.emit("login", name);
+        };
+
+        socket.on("login-success", () => {
             if ($form.parentNode) {
                 $form.parentNode.removeChild($form);
                 resolve($input.value);
             }
-        };
+        });
+
+        socket.on("login-error", (error: string) => {
+            updateErrorMsg(error);
+        });
 
         $btn.addEventListener("click", tryLogin);
 
@@ -62,11 +76,11 @@ function getPlayerName() {
     });
 }
 
-function startGame(name: string) {
-    const $app = document.getElementById("app");
-    if ($app === null) {
+function startGame() {
+    const $el = document.getElementById("app");
+    if ($el === null) {
         throw new Error("Missing #app element");
     }
 
-    GameClient($app, name);
+    GameClient({ $el, socket });
 }

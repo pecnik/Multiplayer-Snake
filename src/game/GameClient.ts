@@ -8,7 +8,12 @@ import { Cell } from "./data/Cell";
 import { CellType } from "./data/CellType";
 import { SnakeFSM } from "./data/SnakeFSM";
 
-export function GameClient($el: HTMLElement, name = prompt("No-name")) {
+export function GameClient(config: {
+    $el: HTMLElement;
+    socket: SocketIOClient.Socket;
+}) {
+    const { $el, socket } = config;
+
     const game = new State();
     let tick = 0;
 
@@ -37,12 +42,7 @@ export function GameClient($el: HTMLElement, name = prompt("No-name")) {
     cavnas.height = buffer.height = HEIGHT;
     $el.appendChild(cavnas);
 
-    const socket = SocketIOClient.connect(
-        location.href.replace(location.port, "8080"),
-        { reconnection: false }
-    );
-
-    socket.emit("join", name);
+    socket.emit("join-game");
 
     socket.on("sync-state", (serverState: State) => {
         Object.assign(game, serverState);
