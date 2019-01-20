@@ -7,10 +7,12 @@ npm i parcel -g
 npm i ts-node -g
 ```
 
+Run dev mode
 ```
 npm run dev
 ```
 
+Start
 ```
 npm run build
 npm run server
