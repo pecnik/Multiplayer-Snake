@@ -89,9 +89,27 @@ export function GameClient($el: HTMLElement) {
             ctx.translate(WORLD_WIDTH, 0);
             ctx.font = "20px VT323";
             ctx.textBaseline = "top";
+
+            // High score
+            const x = Math.round(SIDE * 0.5);
+            ctx.textAlign = "center";
+            ctx.fillStyle = DARK;
+            ctx.fillText(`*** HIGH SCORE ***`, x, 8);
+            if (game.highScore > 0) {
+                const score = game.highScore;
+                const name = game.highScorePlayer;
+                ctx.fillText(`${name}: ${score}`, x, 32);
+            } else {
+                ctx.fillText(`/`, x, 32);
+            }
+
+            ctx.fillText(`-----------------------`, x, 56);
+
+            // Player scoreboard
+            ctx.textAlign = "left";
             game.snakes.forEach((snake, index) => {
-                const x = 8;
-                const y = 8 + 16 * index;
+                const x = 16;
+                const y = 80 + 16 * index;
                 const score = snake === undefined ? "X" : snake.score;
                 const text = `${index + 1}. ${snake.name}: ${score}`;
                 ctx.fillStyle = snake.id === socket.id ? DARK : LIGHT;

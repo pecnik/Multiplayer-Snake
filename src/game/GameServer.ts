@@ -11,7 +11,8 @@ import {
     snakeInputSystem,
     snakeAdvanceSystem,
     snakeCollisionSystem,
-    foodSpawnSystem
+    foodSpawnSystem,
+    highScoreSystem
 } from "./Systems";
 
 export function GameServer(io: SocketIO.Server) {
@@ -22,7 +23,8 @@ export function GameServer(io: SocketIO.Server) {
         snakeInputSystem,
         snakeAdvanceSystem,
         snakeCollisionSystem,
-        foodSpawnSystem
+        foodSpawnSystem,
+        highScoreSystem
     );
 
     io.on("connection", socket => {

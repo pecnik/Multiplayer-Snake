@@ -77,6 +77,12 @@ export function dispatch(state: State, action: Action) {
             break;
         }
 
+        case Action.Type.NEW_HIGH_SCORE: {
+            state.highScore = action.score;
+            state.highScorePlayer = action.playerName;
+            break;
+        }
+
         case Action.Type.UPDATE_SCORES: {
             state.snakes.forEach(snake => {
                 snake.score = getSnakeScore(snake);

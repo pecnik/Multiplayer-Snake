@@ -11,7 +11,8 @@ export type Action =
     | Action.SET_SNAKE_DIR
     | Action.ADVANCE_SNAKE_HEAD
     | Action.REMOVE_SNAKE_TAIL
-    | Action.UPDATE_SCORES;
+    | Action.UPDATE_SCORES
+    | Action.NEW_HIGH_SCORE;
 
 export module Action {
     export enum Type {
@@ -29,7 +30,8 @@ export module Action {
         SYNC_FOOD,
         REMOVE_FOOD,
 
-        UPDATE_SCORES
+        UPDATE_SCORES,
+        NEW_HIGH_SCORE
     }
 
     export interface IAction {
@@ -108,5 +110,15 @@ export module Action {
 
     export class UPDATE_SCORES implements IAction {
         public readonly type = Action.Type.UPDATE_SCORES;
+    }
+
+    export class NEW_HIGH_SCORE implements IAction {
+        public readonly type = Action.Type.NEW_HIGH_SCORE;
+        public readonly score: number;
+        public readonly playerName: string;
+        public constructor(score: number, playerName: string) {
+            this.score = score;
+            this.playerName = playerName;
+        }
     }
 }

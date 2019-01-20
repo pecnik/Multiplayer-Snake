@@ -12,6 +12,7 @@ import {
 } from "./Selectors";
 import { clamp, times } from "lodash";
 import { SnakeFSM } from "./data/SnakeFSM";
+import { Snake } from "./data/Snake";
 
 export interface System {
     (state: State, dispatcher: Action[]): void;
@@ -148,5 +149,21 @@ export function foodSpawnSystem(state: State, dispatcher: Action[]) {
             const food = new Cell(CellType.Food, x, y);
             dispatcher.push(new Action.SYNC_FOOD(food));
         }
+    }
+}
+
+export function highScoreSystem(state: State, dispatcher: Action[]) {
+    let highScore = state.highScore;
+    let highScoreSnake: Snake | undefined;
+    state.snakes.forEach(snake => {
+        if (snake.score > highScore) {
+            highScore = snake.score;
+            highScoreSnake = snake;
+        }
+    });
+
+    if (highScoreSnake !== undefined) {
+        const { score, name } = highScoreSnake;
+        dispatcher.push(new Action.NEW_HIGH_SCORE(score, name));
     }
 }
