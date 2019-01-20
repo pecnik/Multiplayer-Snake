@@ -1,38 +1,38 @@
 import SocketIO from "socket.io";
 import { Action } from "./Actions";
 import { State } from "./data/State";
+import { Direction } from "./data/Direction";
+import { Snake } from "./data/Snake";
+import { uniqueId } from "lodash";
 import { dispatch } from "./Dispatch";
 import {
     System,
+    snakeSpawnSystem,
     snakeInputSystem,
     snakeAdvanceSystem,
-    sankeFoodSystem,
+    snakeCollisionSystem,
     foodSpawnSystem,
-    snakeDeathSystem,
-    gameSessionSystem
+    highScoreSystem
 } from "./Systems";
-import { Direction } from "./data/Direction";
-import { Player } from "./data/Player";
-import { uniqueId } from "lodash";
 
 export function GameServer(io: SocketIO.Server) {
     const state = new State();
     const udpates = new Array<Action>();
     const systems = new Array<System>(
-        gameSessionSystem,
+        snakeSpawnSystem,
         snakeInputSystem,
         snakeAdvanceSystem,
-        sankeFoodSystem,
+        snakeCollisionSystem,
         foodSpawnSystem,
-        snakeDeathSystem
+        highScoreSystem
     );
 
     io.on("connection", socket => {
         socket.on("join", (name: string = `Player-${uniqueId()}`) => {
-            const player = new Player(socket.id, name);
-            udpates.push(new Action.ADD_PLAYER(player));
+            const snake = new Snake(socket.id, name);
+            udpates.push(new Action.SYNC_SNAKE(snake));
             socket.emit("sync-state", state);
-            console.log("New player: ", player.name);
+            console.log("New player: ", snake.name);
         });
 
         socket.on("input", (input: Direction) => {
@@ -43,36 +43,25 @@ export function GameServer(io: SocketIO.Server) {
         });
 
         socket.on("disconnect", () => {
-            udpates.push(new Action.REMOVE_PLAYER(socket.id));
+            udpates.push(new Action.REMOVE_SNAKE(socket.id));
         });
     });
 
+    const UPDATE_SCORES = new Action.UPDATE_SCORES();
     setInterval(() => {
-        if (state.freezeScreen.timer > 0) {
-            if (state.freezeScreen.timer > 1) {
-                udpates.push(
-                    new Action.FREEZE_SCREEN(
-                        state.freezeScreen.timer - 1,
-                        state.freezeScreen.actions
-                    )
-                );
-            } else {
-                udpates.push(...state.freezeScreen.actions);
-                udpates.push(new Action.FREEZE_SCREEN(0, []));
-            }
-        }
-
         udpates.forEach(action => dispatch(state, action));
+        systems.forEach(system => {
+            const dispatcher = new Array<Action>();
+            system(state, dispatcher);
+            dispatcher.forEach(action => dispatch(state, action));
+            udpates.push(...dispatcher);
+        });
 
-        if (state.freezeScreen.timer === 0) {
-            systems.forEach(system => {
-                const dispatcher = new Array<Action>();
-                system(state, dispatcher);
-                dispatcher.forEach(action => dispatch(state, action));
-                udpates.push(...dispatcher);
-            });
-        }
+        // Is called every frame
+        udpates.push(UPDATE_SCORES);
+        dispatch(state, UPDATE_SCORES);
 
+        // Dump
         io.sockets.emit("tick", [...udpates]);
         udpates.splice(0, udpates.length);
     }, 1000 / 10);

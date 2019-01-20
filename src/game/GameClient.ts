@@ -6,9 +6,11 @@ import { Action } from "./Actions";
 import { dispatch } from "./Dispatch";
 import { Cell } from "./data/Cell";
 import { CellType } from "./data/CellType";
+import { SnakeFSM } from "./data/SnakeFSM";
 
 export function GameClient($el: HTMLElement) {
     const game = new State();
+    let tick = 0;
 
     const CELL = 12;
     const CELL_SMALL = Math.floor(CELL / 3);
@@ -40,7 +42,7 @@ export function GameClient($el: HTMLElement) {
         { reconnection: false }
     );
 
-    const name = prompt("Player name:", "Player");
+    const name = "Player" || prompt("Player name:", "Player");
     socket.emit("join", name);
 
     socket.on("sync-state", (serverState: State) => {
@@ -49,6 +51,7 @@ export function GameClient($el: HTMLElement) {
     });
 
     socket.on("tick", (udpates: Action[]) => {
+        tick++;
         udpates.forEach(action => dispatch(game, action));
         requestAnimationFrame(render);
     });
@@ -61,17 +64,6 @@ export function GameClient($el: HTMLElement) {
     });
 
     function render() {
-        if (game.freezeScreen.timer > 0) {
-            const screen = cavnas.getContext("2d");
-            if (screen !== null) {
-                screen.clearRect(0, 0, WIDTH, HEIGHT);
-                if (game.freezeScreen.timer % 2 === 0) {
-                    screen.drawImage(buffer, 0, 0);
-                }
-            }
-            return;
-        }
-
         const ctx = buffer.getContext("2d");
         const LIGHT = "#60a3bc";
         const DARK = "#0a3d62";
@@ -85,6 +77,10 @@ export function GameClient($el: HTMLElement) {
             ctx.fillStyle = LIGHT;
             game.food.forEach(cell => renderCell(ctx, cell));
             game.snakes.forEach(snake => {
+                if (snake.fsm === SnakeFSM.Dead) return;
+                if (snake.fsm === SnakeFSM.Spawning && tick % 2 === 0) return;
+                if (snake.fsm === SnakeFSM.Despawning && tick % 2 === 0) return;
+
                 ctx.fillStyle = snake.id === socket.id ? DARK : LIGHT;
                 snake.cells.forEach(cell => renderCell(ctx, cell));
             });
@@ -93,13 +89,30 @@ export function GameClient($el: HTMLElement) {
             ctx.translate(WORLD_WIDTH, 0);
             ctx.font = "20px VT323";
             ctx.textBaseline = "top";
-            game.players.forEach((player, index) => {
-                const x = 8;
-                const y = 8 + 16 * index;
-                const snake = game.snakes.find(snake => snake.id === player.id);
-                const score = snake === undefined ? "X" : snake.cells.length;
-                const text = `${index + 1}. ${player.name}: ${score}`;
-                ctx.fillStyle = player.id === socket.id ? DARK : LIGHT;
+
+            // High score
+            const x = Math.round(SIDE * 0.5);
+            ctx.textAlign = "center";
+            ctx.fillStyle = DARK;
+            ctx.fillText(`*** HIGH SCORE ***`, x, 8);
+            if (game.highScore > 0) {
+                const score = game.highScore;
+                const name = game.highScorePlayer;
+                ctx.fillText(`${name}: ${score}`, x, 32);
+            } else {
+                ctx.fillText(`/`, x, 32);
+            }
+
+            ctx.fillText(`-----------------------`, x, 56);
+
+            // Player scoreboard
+            ctx.textAlign = "left";
+            game.snakes.forEach((snake, index) => {
+                const x = 16;
+                const y = 80 + 16 * index;
+                const score = snake === undefined ? "X" : snake.score;
+                const text = `${index + 1}. ${snake.name}: ${score}`;
+                ctx.fillStyle = snake.id === socket.id ? DARK : LIGHT;
                 ctx.fillText(text, x, y);
             });
             ctx.translate(-WORLD_WIDTH, 0);

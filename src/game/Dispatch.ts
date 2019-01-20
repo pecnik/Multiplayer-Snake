@@ -1,6 +1,7 @@
 import { State } from "./data/State";
 import { Action } from "./Actions";
 import { memoize } from "lodash";
+import { getSnakeScore } from "./Selectors";
 
 export const undefinedTypeWarning = memoize((action: Action) => {
     const type = Action.Type[action.type] || action.type;
@@ -10,38 +11,7 @@ export const undefinedTypeWarning = memoize((action: Action) => {
 
 export function dispatch(state: State, action: Action) {
     switch (action.type) {
-        case Action.Type.ADD_PLAYER: {
-            const { player } = action;
-            dispatch(state, new Action.REMOVE_PLAYER(player.id));
-            state.players.push(player);
-            break;
-        }
-
-        case Action.Type.REMOVE_PLAYER: {
-            const { playerId } = action;
-            dispatch(state, new Action.REMOVE_SNAKE(playerId));
-            state.players = state.players.filter(player => {
-                return player.id !== playerId;
-            });
-            break;
-        }
-
-        case Action.Type.ADD_FOOD: {
-            const { food } = action;
-            dispatch(state, new Action.REMOVE_FOOD(food));
-            state.food.push(food);
-            break;
-        }
-
-        case Action.Type.REMOVE_FOOD: {
-            const { food } = action;
-            state.food = state.food.filter(cell => {
-                return cell.x !== food.x || cell.y !== food.y;
-            });
-            break;
-        }
-
-        case Action.Type.ADD_SNAKE: {
+        case Action.Type.SYNC_SNAKE: {
             const { snake } = action;
             dispatch(state, new Action.REMOVE_SNAKE(snake.id));
             state.snakes.push(snake);
@@ -92,10 +62,38 @@ export function dispatch(state: State, action: Action) {
             break;
         }
 
-        case Action.Type.FREEZE_SCREEN: {
-            const { timer, actions } = action;
-            state.freezeScreen.timer = timer;
-            state.freezeScreen.actions = actions;
+        case Action.Type.SYNC_FOOD: {
+            const { food } = action;
+            dispatch(state, new Action.REMOVE_FOOD(food));
+            state.food.push(food);
+            break;
+        }
+
+        case Action.Type.REMOVE_FOOD: {
+            const { food } = action;
+            state.food = state.food.filter(cell => {
+                return cell.x !== food.x || cell.y !== food.y;
+            });
+            break;
+        }
+
+        case Action.Type.NEW_HIGH_SCORE: {
+            state.highScore = action.score;
+            state.highScorePlayer = action.playerName;
+            break;
+        }
+
+        case Action.Type.UPDATE_SCORES: {
+            state.snakes.forEach(snake => {
+                snake.score = getSnakeScore(snake);
+            });
+
+            state.snakes.sort((a, b) => {
+                if (a.score === b.score) {
+                    return a.id < b.id ? 1 : -1;
+                }
+                return a.score < b.score ? 1 : -1;
+            });
             break;
         }
 
