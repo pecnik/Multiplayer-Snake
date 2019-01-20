@@ -5,6 +5,7 @@ import { SnakeFSM } from "./SnakeFSM";
 export class Snake {
     public readonly id: string;
     public readonly name: string;
+    public score = 0;
     public fsm = SnakeFSM.Dead;
     public dir = Direction.right;
     public input = Direction.right;

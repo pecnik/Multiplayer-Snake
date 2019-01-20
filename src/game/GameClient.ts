@@ -92,7 +92,7 @@ export function GameClient($el: HTMLElement) {
             game.snakes.forEach((snake, index) => {
                 const x = 8;
                 const y = 8 + 16 * index;
-                const score = snake === undefined ? "X" : snake.cells.length;
+                const score = snake === undefined ? "X" : snake.score;
                 const text = `${index + 1}. ${snake.name}: ${score}`;
                 ctx.fillStyle = snake.id === socket.id ? DARK : LIGHT;
                 ctx.fillText(text, x, y);

@@ -16,6 +16,11 @@ export function forEachSnakeFSM(fsm: SnakeFSM) {
     };
 }
 
+export function getSnakeScore(snake: Snake) {
+    if (snake.fsm !== SnakeFSM.Alive) return 0;
+    return snake.cells.length - 3;
+}
+
 export function isCellEmpty(state: State, x: number, y: number): boolean {
     for (let i = 0; i < state.snakes.length; i++) {
         const snake = state.snakes[i];

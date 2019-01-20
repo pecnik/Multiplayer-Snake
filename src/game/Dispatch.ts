@@ -1,6 +1,7 @@
 import { State } from "./data/State";
 import { Action } from "./Actions";
 import { memoize } from "lodash";
+import { getSnakeScore } from "./Selectors";
 
 export const undefinedTypeWarning = memoize((action: Action) => {
     const type = Action.Type[action.type] || action.type;
@@ -72,6 +73,20 @@ export function dispatch(state: State, action: Action) {
             const { food } = action;
             state.food = state.food.filter(cell => {
                 return cell.x !== food.x || cell.y !== food.y;
+            });
+            break;
+        }
+
+        case Action.Type.UPDATE_SCORES: {
+            state.snakes.forEach(snake => {
+                snake.score = getSnakeScore(snake);
+            });
+
+            state.snakes.sort((a, b) => {
+                if (a.score === b.score) {
+                    return a.id < b.id ? 1 : -1;
+                }
+                return a.score < b.score ? 1 : -1;
             });
             break;
         }

@@ -45,6 +45,7 @@ export function GameServer(io: SocketIO.Server) {
         });
     });
 
+    const UPDATE_SCORES = new Action.UPDATE_SCORES();
     setInterval(() => {
         udpates.forEach(action => dispatch(state, action));
         systems.forEach(system => {
@@ -54,6 +55,11 @@ export function GameServer(io: SocketIO.Server) {
             udpates.push(...dispatcher);
         });
 
+        // Is called every frame
+        udpates.push(UPDATE_SCORES);
+        dispatch(state, UPDATE_SCORES);
+
+        // Dump
         io.sockets.emit("tick", [...udpates]);
         udpates.splice(0, udpates.length);
     }, 1000 / 10);

@@ -10,7 +10,8 @@ export type Action =
     | Action.SET_SNAKE_INPUT
     | Action.SET_SNAKE_DIR
     | Action.ADVANCE_SNAKE_HEAD
-    | Action.REMOVE_SNAKE_TAIL;
+    | Action.REMOVE_SNAKE_TAIL
+    | Action.UPDATE_SCORES;
 
 export module Action {
     export enum Type {
@@ -26,14 +27,14 @@ export module Action {
         REMOVE_SNAKE_TAIL,
 
         SYNC_FOOD,
-        REMOVE_FOOD
+        REMOVE_FOOD,
+
+        UPDATE_SCORES
     }
 
     export interface IAction {
         readonly type: Action.Type;
     }
-
-
 
     export class SYNC_SNAKE implements IAction {
         public readonly type = Action.Type.SYNC_SNAKE;
@@ -103,5 +104,9 @@ export module Action {
         public constructor(food: Cell) {
             this.food = food;
         }
+    }
+
+    export class UPDATE_SCORES implements IAction {
+        public readonly type = Action.Type.UPDATE_SCORES;
     }
 }
