@@ -5,6 +5,7 @@ export enum Keys {
     D = 68,
     R = 82,
     F = 70,
+    ENTER = 13,
     SHIFT = 16,
     SPACE = 32,
     CTRL = 17,

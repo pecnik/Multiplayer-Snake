@@ -18,20 +18,22 @@
         />
     </head>
     <body>
-        <div id="login">
-            <input
-                id="input"
-                type="text"
-                name="player-name"
-                value=""
-                placeholder="Player name ..."
-                autocomplete="off"
-                autofocus
-            />
-            <button id="login-btn" disabled>LOGIN</button>
-            <strong id="error" style="display: none;"></strong>
+        <div id="app">
+            <div id="game"><!-- Canvas container --></div>
+            <div id="login">
+                <input
+                    id="input"
+                    type="text"
+                    name="player-name"
+                    value=""
+                    placeholder="Player name ..."
+                    autocomplete="off"
+                    autofocus
+                />
+                <span id="error" style="display: none;"></span>
+                <button id="login-btn">LOGIN</button>
+            </div>
         </div>
-        <div id="game"></div>
         <script src="./script/index.ts"></script>
     </body>
 </html>
