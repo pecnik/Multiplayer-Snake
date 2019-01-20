@@ -92,13 +92,6 @@ export function dispatch(state: State, action: Action) {
             break;
         }
 
-        case Action.Type.FREEZE_SCREEN: {
-            const { timer, actions } = action;
-            state.freezeScreen.timer = timer;
-            state.freezeScreen.actions = actions;
-            break;
-        }
-
         default: {
             undefinedTypeWarning(action);
             return;

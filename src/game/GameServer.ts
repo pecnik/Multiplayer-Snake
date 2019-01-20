@@ -48,30 +48,13 @@ export function GameServer(io: SocketIO.Server) {
     });
 
     setInterval(() => {
-        if (state.freezeScreen.timer > 0) {
-            if (state.freezeScreen.timer > 1) {
-                udpates.push(
-                    new Action.FREEZE_SCREEN(
-                        state.freezeScreen.timer - 1,
-                        state.freezeScreen.actions
-                    )
-                );
-            } else {
-                udpates.push(...state.freezeScreen.actions);
-                udpates.push(new Action.FREEZE_SCREEN(0, []));
-            }
-        }
-
         udpates.forEach(action => dispatch(state, action));
-
-        if (state.freezeScreen.timer === 0) {
-            systems.forEach(system => {
-                const dispatcher = new Array<Action>();
-                system(state, dispatcher);
-                dispatcher.forEach(action => dispatch(state, action));
-                udpates.push(...dispatcher);
-            });
-        }
+        systems.forEach(system => {
+            const dispatcher = new Array<Action>();
+            system(state, dispatcher);
+            dispatcher.forEach(action => dispatch(state, action));
+            udpates.push(...dispatcher);
+        });
 
         io.sockets.emit("tick", [...udpates]);
         udpates.splice(0, udpates.length);

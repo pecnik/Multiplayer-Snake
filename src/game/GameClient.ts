@@ -61,17 +61,6 @@ export function GameClient($el: HTMLElement) {
     });
 
     function render() {
-        if (game.freezeScreen.timer > 0) {
-            const screen = cavnas.getContext("2d");
-            if (screen !== null) {
-                screen.clearRect(0, 0, WIDTH, HEIGHT);
-                if (game.freezeScreen.timer % 2 === 0) {
-                    screen.drawImage(buffer, 0, 0);
-                }
-            }
-            return;
-        }
-
         const ctx = buffer.getContext("2d");
         const LIGHT = "#60a3bc";
         const DARK = "#0a3d62";
