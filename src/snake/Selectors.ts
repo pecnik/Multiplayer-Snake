@@ -1,6 +1,7 @@
 import { State } from "./data/State";
 import { Snake } from "./data/Snake";
 import { SnakeFSM } from "./data/SnakeFSM";
+import { range } from "lodash";
 
 export const forEachDeadSnake = forEachSnakeFSM(SnakeFSM.Dead);
 export const forEachAliveSnake = forEachSnakeFSM(SnakeFSM.Alive);
@@ -59,6 +60,14 @@ export function isCellRadiusEmpty(
     return true;
 }
 
+export const SPECIAL_CHARACTERS = ["-", "_", " "];
+export const ALLOWED_CHARACTERS = [
+    ...SPECIAL_CHARACTERS.map(x => x.charCodeAt(0)),
+    ...range("a".charCodeAt(0), "z".charCodeAt(0)),
+    ...range("A".charCodeAt(0), "Z".charCodeAt(0)),
+    ...range("0".charCodeAt(0), "9".charCodeAt(0))
+];
+
 export function getPlayerNameErrors(name: string): string | undefined {
     if (name.length < 3) {
         return "Name must contain at least 3 characters.";
@@ -68,20 +77,10 @@ export function getPlayerNameErrors(name: string): string | undefined {
         return "Name cannot be longer than 12 characters.";
     }
 
-    const allowedCharacters = [["A", "Z"], ["a", "z"], ["0", "9"]];
-    const allowedCharactersRange = allowedCharacters.map(range => {
-        return range.map(x => x.charCodeAt(0));
-    });
-
     for (let i = 0; i < name.length; i++) {
-        const char = name.charCodeAt(i);
-        const valid = allowedCharactersRange.some(range => {
-            const [min, max] = range;
-            return char >= min && char <= max;
-        });
-
-        if (!valid) {
-            return "Names can contain only letters and numbers.";
+        const charCode = name.charCodeAt(i);
+        if (ALLOWED_CHARACTERS.indexOf(charCode) === -1) {
+            return "Names can only contain letters and numbers.";
         }
     }
 
