@@ -64,8 +64,8 @@ export function getPlayerNameErrors(name: string): string | undefined {
         return "Name must contain at least 3 characters.";
     }
 
-    if (name.length >= 8) {
-        return "Username cannot be longer than 8 characters.";
+    if (name.length > 12) {
+        return "Name cannot be longer than 12 characters.";
     }
 
     const allowedCharacters = [["A", "Z"], ["a", "z"], ["0", "9"]];
