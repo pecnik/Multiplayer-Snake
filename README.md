@@ -15,7 +15,7 @@ npm run dev
 Start
 ```
 npm run build
-npm run server
+npm start
 ```
 
 
