@@ -7,16 +7,18 @@ import { uniqueId } from "lodash";
 import { dispatch } from "./Dispatch";
 import {
     System,
+    snakeSpawnSystem,
     snakeInputSystem,
     snakeAdvanceSystem,
-    foodSpawnSystem,
-    snakeCollisionSystem
+    snakeCollisionSystem,
+    foodSpawnSystem
 } from "./Systems";
 
 export function GameServer(io: SocketIO.Server) {
     const state = new State();
     const udpates = new Array<Action>();
     const systems = new Array<System>(
+        snakeSpawnSystem,
         snakeInputSystem,
         snakeAdvanceSystem,
         snakeCollisionSystem,

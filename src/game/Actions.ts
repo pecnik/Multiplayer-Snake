@@ -14,14 +14,19 @@ export type Action =
 
 export module Action {
     export enum Type {
-        ADD_FOOD,
-        REMOVE_FOOD,
         ADD_SNAKE,
         REMOVE_SNAKE,
+
+        SPAWN_SNAKE,
+
         SET_SNAKE_INPUT,
         SET_SNAKE_DIR,
+
         ADVANCE_SNAKE_HEAD,
-        REMOVE_SNAKE_TAIL
+        REMOVE_SNAKE_TAIL,
+
+        ADD_FOOD,
+        REMOVE_FOOD
     }
 
     export interface IAction {

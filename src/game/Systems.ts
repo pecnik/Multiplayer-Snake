@@ -3,11 +3,32 @@ import { State } from "./data/State";
 import { Cell } from "./data/Cell";
 import { CellType } from "./data/CellType";
 import { Direction } from "./data/Direction";
-import { forEachAliveSnake } from "./Selectors";
+import { forEachAliveSnake, forEachDeadSnake } from "./Selectors";
 import { clamp } from "lodash";
+import { SnakeFSM } from "./data/SnakeFSM";
 
 export interface System {
     (state: State, dispatcher: Action[]): void;
+}
+
+export function snakeSpawnSystem(state: State, dispatcher: Action[]) {
+    forEachDeadSnake(state, snake => {
+        snake.fsm = SnakeFSM.Alive;
+        snake.dir = Direction.right;
+        snake.input = Direction.right;
+        snake.cells = (() => {
+            const cells = new Array<Cell>();
+            const length = 3;
+            const x = Math.floor(state.cols * 0.5) - Math.floor(length * 0.5);
+            const y = Math.floor(state.rows * 0.5);
+            for (let i = 0; i < length; i++) {
+                cells.push(new Cell(CellType.Snake, x - i, y));
+            }
+            return cells;
+        })();
+
+        dispatcher.push(new Action.ADD_SNAKE(snake));
+    });
 }
 
 export function snakeInputSystem(state: State, dispatcher: Action[]) {
@@ -71,7 +92,8 @@ export function snakeCollisionSystem(state: State, dispatcher: Action[]) {
         });
 
         if (collision) {
-            dispatcher.push(new Action.REMOVE_SNAKE(snake.id));
+            snake.fsm = SnakeFSM.Dead;
+            dispatcher.push(new Action.ADD_SNAKE(snake));
         }
     });
 }
