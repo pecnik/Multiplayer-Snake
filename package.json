@@ -4,7 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "build": "parcel build src/app/index.html",
+    "build": "parcel build src/client/index.html",
     "start": "set NODE_ENV=production && ts-node index.js",
     "dev": "set NODE_ENV=development && ts-node index.js"
   },
