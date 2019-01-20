@@ -3,7 +3,6 @@ import { Action } from "./Actions";
 import { State } from "./data/State";
 import { Direction } from "./data/Direction";
 import { Snake } from "./data/Snake";
-import { uniqueId } from "lodash";
 import { dispatch } from "./Dispatch";
 import {
     System,
