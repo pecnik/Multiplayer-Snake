@@ -1,6 +1,9 @@
 import SocketIO from "socket.io";
 import { Action } from "./Actions";
 import { State } from "./data/State";
+import { Direction } from "./data/Direction";
+import { Snake } from "./data/Snake";
+import { uniqueId } from "lodash";
 import { dispatch } from "./Dispatch";
 import {
     System,
@@ -8,18 +11,13 @@ import {
     snakeAdvanceSystem,
     sankeFoodSystem,
     foodSpawnSystem,
-    snakeDeathSystem,
-    gameSessionSystem
+    snakeDeathSystem
 } from "./Systems";
-import { Direction } from "./data/Direction";
-import { Player } from "./data/Player";
-import { uniqueId } from "lodash";
 
 export function GameServer(io: SocketIO.Server) {
     const state = new State();
     const udpates = new Array<Action>();
     const systems = new Array<System>(
-        gameSessionSystem,
         snakeInputSystem,
         snakeAdvanceSystem,
         sankeFoodSystem,
@@ -29,10 +27,10 @@ export function GameServer(io: SocketIO.Server) {
 
     io.on("connection", socket => {
         socket.on("join", (name: string = `Player-${uniqueId()}`) => {
-            const player = new Player(socket.id, name);
-            udpates.push(new Action.ADD_PLAYER(player));
+            const snake = new Snake(socket.id, name);
+            udpates.push(new Action.ADD_SNAKE(snake));
             socket.emit("sync-state", state);
-            console.log("New player: ", player.name);
+            console.log("New player: ", snake.name);
         });
 
         socket.on("input", (input: Direction) => {
@@ -43,7 +41,7 @@ export function GameServer(io: SocketIO.Server) {
         });
 
         socket.on("disconnect", () => {
-            udpates.push(new Action.REMOVE_PLAYER(socket.id));
+            udpates.push(new Action.REMOVE_SNAKE(socket.id));
         });
     });
 

@@ -3,49 +3,10 @@ import { State } from "./data/State";
 import { Cell } from "./data/Cell";
 import { CellType } from "./data/CellType";
 import { Direction } from "./data/Direction";
-import { Snake } from "./data/Snake";
 import { clamp } from "lodash";
 
 export interface System {
     (state: State, dispatcher: Action[]): void;
-}
-
-export function gameSessionSystem(state: State, dispatcher: Action[]) {
-    const { players, snakes } = state;
-
-    // Only one player
-    if (players.length === 1 && snakes.length < 1) {
-        const [player] = players;
-        const snake = createSnake(player.id);
-        dispatcher.push(new Action.ADD_SNAKE(snake));
-        return;
-    }
-
-    // One snake left
-    if (players.length > 1 && snakes.length <= 1) {
-        const offset = Math.floor(state.rows / (players.length * 2));
-        players.forEach((player, index) => {
-            const snake = createSnake(player.id);
-            const y = offset * (index + 1);
-            snake.cells.forEach(cell => (cell.y = y));
-            dispatcher.push(new Action.ADD_SNAKE(snake));
-        });
-        return;
-    }
-
-    function createSnake(snakeId: string) {
-        const length = 3;
-        const x = Math.floor(state.cols * 0.5) - Math.floor(length * 0.5);
-        const y = Math.floor(state.rows * 0.5);
-
-        const snake = new Snake(snakeId);
-        snake.dir = Direction.right;
-        for (let i = 0; i < length; i++) {
-            snake.cells.push(new Cell(CellType.Snake, x - i, y));
-        }
-
-        return snake;
-    }
 }
 
 export function snakeInputSystem(state: State, dispatcher: Action[]) {

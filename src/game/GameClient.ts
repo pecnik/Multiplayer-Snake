@@ -40,7 +40,7 @@ export function GameClient($el: HTMLElement) {
         { reconnection: false }
     );
 
-    const name = prompt("Player name:", "Player");
+    const name = "Player" || prompt("Player name:", "Player");
     socket.emit("join", name);
 
     socket.on("sync-state", (serverState: State) => {
@@ -82,13 +82,12 @@ export function GameClient($el: HTMLElement) {
             ctx.translate(WORLD_WIDTH, 0);
             ctx.font = "20px VT323";
             ctx.textBaseline = "top";
-            game.players.forEach((player, index) => {
+            game.snakes.forEach((snake, index) => {
                 const x = 8;
                 const y = 8 + 16 * index;
-                const snake = game.snakes.find(snake => snake.id === player.id);
                 const score = snake === undefined ? "X" : snake.cells.length;
-                const text = `${index + 1}. ${player.name}: ${score}`;
-                ctx.fillStyle = player.id === socket.id ? DARK : LIGHT;
+                const text = `${index + 1}. ${snake.name}: ${score}`;
+                ctx.fillStyle = snake.id === socket.id ? DARK : LIGHT;
                 ctx.fillText(text, x, y);
             });
             ctx.translate(-WORLD_WIDTH, 0);

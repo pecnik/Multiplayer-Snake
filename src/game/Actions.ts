@@ -1,15 +1,12 @@
 import { Snake } from "./data/Snake";
 import { Cell } from "./data/Cell";
 import { Direction } from "./data/Direction";
-import { Player } from "./data/Player";
 
 export type Action =
-    | Action.ADD_PLAYER
-    | Action.REMOVE_PLAYER
-    | Action.ADD_FOOD
-    | Action.REMOVE_FOOD
     | Action.ADD_SNAKE
     | Action.REMOVE_SNAKE
+    | Action.ADD_FOOD
+    | Action.REMOVE_FOOD
     | Action.SET_SNAKE_INPUT
     | Action.SET_SNAKE_DIR
     | Action.ADVANCE_SNAKE_HEAD
@@ -17,8 +14,6 @@ export type Action =
 
 export module Action {
     export enum Type {
-        ADD_PLAYER,
-        REMOVE_PLAYER,
         ADD_FOOD,
         REMOVE_FOOD,
         ADD_SNAKE,
@@ -31,22 +26,6 @@ export module Action {
 
     export interface IAction {
         readonly type: Action.Type;
-    }
-
-    export class ADD_PLAYER implements IAction {
-        public readonly type = Action.Type.ADD_PLAYER;
-        public readonly player: Player;
-        public constructor(player: Player) {
-            this.player = player;
-        }
-    }
-
-    export class REMOVE_PLAYER implements IAction {
-        public readonly type = Action.Type.REMOVE_PLAYER;
-        public readonly playerId: string;
-        public constructor(playerId: string) {
-            this.playerId = playerId;
-        }
     }
 
     export class ADD_FOOD implements IAction {
