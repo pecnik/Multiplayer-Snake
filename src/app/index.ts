@@ -6,15 +6,15 @@ getPlayerName().then(startGame);
 
 function getPlayerName() {
     return new Promise(resolve => {
+        const $form = document.querySelector("#login") as HTMLElement;
         const $input = document.querySelector("#input") as HTMLInputElement;
         const $error = document.querySelector("#error") as HTMLElement;
         const $btn = document.querySelector("#login-btn") as HTMLButtonElement;
-        if (!$error || !$input || !$btn) {
+        if (!$form || !$error || !$input || !$btn) {
             throw new Error("Missing #login element");
         }
 
         const updateErrorMsg = debounce((error?: string | undefined) => {
-            console.log({ error });
             if (error !== undefined) {
                 $error.style.display = "block";
                 $error.innerHTML = error;
@@ -27,13 +27,15 @@ function getPlayerName() {
             const name = $input.value;
             const error = getPlayerNameErrors(name);
             if (error) {
-                console.log("TRY", error);
                 $btn.disabled = true;
                 updateErrorMsg(error);
                 return;
             }
 
-            console.log("OK", { name });
+            if ($form.parentNode) {
+                $form.parentNode.removeChild($form);
+                resolve($input.value);
+            }
         };
 
         $btn.addEventListener("click", tryLogin);
@@ -60,11 +62,11 @@ function getPlayerName() {
     });
 }
 
-function startGame() {
+function startGame(name: string) {
     const $app = document.getElementById("app");
     if ($app === null) {
         throw new Error("Missing #app element");
     }
 
-    GameClient($app);
+    GameClient($app, name);
 }

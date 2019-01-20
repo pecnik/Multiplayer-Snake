@@ -8,7 +8,7 @@ import { Cell } from "./data/Cell";
 import { CellType } from "./data/CellType";
 import { SnakeFSM } from "./data/SnakeFSM";
 
-export function GameClient($el: HTMLElement) {
+export function GameClient($el: HTMLElement, name = prompt("No-name")) {
     const game = new State();
     let tick = 0;
 
@@ -42,7 +42,6 @@ export function GameClient($el: HTMLElement) {
         { reconnection: false }
     );
 
-    const name = "Player" || prompt("Player name:", "Player");
     socket.emit("join", name);
 
     socket.on("sync-state", (serverState: State) => {
