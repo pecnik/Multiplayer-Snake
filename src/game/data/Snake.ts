@@ -9,6 +9,7 @@ export class Snake {
     public dir = Direction.right;
     public input = Direction.right;
     public cells = new Array<Cell>();
+    public timer = 0;
 
     public constructor(id: string, name: string) {
         this.id = id;

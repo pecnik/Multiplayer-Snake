@@ -1,6 +1,6 @@
 export enum SnakeFSM {
-    Alive,
-    Despawning,
     Dead,
-    Spawning
+    Spawning,
+    Alive,
+    Despawning
 }

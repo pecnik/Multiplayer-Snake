@@ -3,7 +3,11 @@ import { State } from "./data/State";
 import { Cell } from "./data/Cell";
 import { CellType } from "./data/CellType";
 import { Direction } from "./data/Direction";
-import { forEachAliveSnake, forEachDeadSnake } from "./Selectors";
+import {
+    forEachAliveSnake,
+    forEachDeadSnake,
+    forEachDespawningSnake
+} from "./Selectors";
 import { clamp } from "lodash";
 import { SnakeFSM } from "./data/SnakeFSM";
 
@@ -12,6 +16,8 @@ export interface System {
 }
 
 export function snakeSpawnSystem(state: State, dispatcher: Action[]) {
+    // Dead --> Spawning --> Alive --> Despawning
+
     forEachDeadSnake(state, snake => {
         snake.fsm = SnakeFSM.Alive;
         snake.dir = Direction.right;
@@ -28,6 +34,15 @@ export function snakeSpawnSystem(state: State, dispatcher: Action[]) {
         })();
 
         dispatcher.push(new Action.ADD_SNAKE(snake));
+    });
+
+    forEachDespawningSnake(state, snake => {
+        snake.timer--;
+        if (snake.timer <= 0) {
+            snake.fsm = SnakeFSM.Dead;
+            snake.timer = 0;
+            dispatcher.push(new Action.ADD_SNAKE(snake));
+        }
     });
 }
 
@@ -92,7 +107,8 @@ export function snakeCollisionSystem(state: State, dispatcher: Action[]) {
         });
 
         if (collision) {
-            snake.fsm = SnakeFSM.Dead;
+            snake.fsm = SnakeFSM.Despawning;
+            snake.timer = 10;
             dispatcher.push(new Action.ADD_SNAKE(snake));
         }
     });
