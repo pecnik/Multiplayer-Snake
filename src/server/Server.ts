@@ -1,10 +1,12 @@
 import SocketIO from "socket.io";
+import path from "path";
 import { Action } from "../snake/Actions";
 import { State } from "../snake/data/State";
 import { Direction } from "../snake/data/Direction";
 import { Snake } from "../snake/data/Snake";
 import { dispatch } from "../snake/Dispatch";
 import { getPlayerNameErrors } from "../snake/Selectors";
+import { loadHighScoreData, saveHighScoreData } from "./Storage";
 import {
     System,
     snakeSpawnSystem,
@@ -26,6 +28,11 @@ export function runGameServer(io: SocketIO.Server) {
         foodSpawnSystem,
         highScoreSystem
     );
+
+    const STORAGE_PATH = path.resolve(__dirname + "/../../storage.json");
+    const data = loadHighScoreData(STORAGE_PATH);
+    state.highScore = data.highScore;
+    state.highScorePlayer = data.highScorePlayer;
 
     // Handle players
     io.on("connection", socket => {
@@ -55,6 +62,16 @@ export function runGameServer(io: SocketIO.Server) {
         // Is called every frame
         udpates.push(UPDATE_SCORES);
         dispatch(state, UPDATE_SCORES);
+
+        // Check for high-score
+        udpates.forEach(action => {
+            if (action.type === Action.Type.NEW_HIGH_SCORE) {
+                saveHighScoreData(STORAGE_PATH, {
+                    highScore: state.highScore,
+                    highScorePlayer: state.highScorePlayer
+                });
+            }
+        });
 
         // Dump
         io.sockets.emit("tick", [...udpates]);
