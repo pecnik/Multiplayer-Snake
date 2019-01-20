@@ -1,6 +1,6 @@
 import SocketIOClient from "socket.io-client";
-import { GameClient } from "../game/GameClient";
-import { getPlayerNameErrors } from "../game/Selectors";
+import { GameClient } from "../snake/GameClient";
+import { getPlayerNameErrors } from "../snake/Selectors";
 import { debounce } from "lodash";
 
 const socket = SocketIOClient.connect(

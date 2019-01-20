@@ -23,5 +23,5 @@ if (env === "development") {
 // run game server
 const srv = app.listen(PORT);
 const io = require("socket.io").listen(srv);
-const { GameServer } = require("./src/game/GameServer");
+const { GameServer } = require("./src/snake/GameServer");
 GameServer(io);
