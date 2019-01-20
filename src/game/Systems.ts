@@ -6,7 +6,8 @@ import { Direction } from "./data/Direction";
 import {
     forEachAliveSnake,
     forEachDeadSnake,
-    forEachDespawningSnake
+    forEachDespawningSnake,
+    forEachSpawningSnake
 } from "./Selectors";
 import { clamp } from "lodash";
 import { SnakeFSM } from "./data/SnakeFSM";
@@ -16,10 +17,9 @@ export interface System {
 }
 
 export function snakeSpawnSystem(state: State, dispatcher: Action[]) {
-    // Dead --> Spawning --> Alive --> Despawning
-
     forEachDeadSnake(state, snake => {
-        snake.fsm = SnakeFSM.Alive;
+        snake.fsm = SnakeFSM.Spawning;
+        snake.timer = 10;
         snake.dir = Direction.right;
         snake.input = Direction.right;
         snake.cells = (() => {
@@ -36,18 +36,25 @@ export function snakeSpawnSystem(state: State, dispatcher: Action[]) {
         dispatcher.push(new Action.ADD_SNAKE(snake));
     });
 
+    forEachSpawningSnake(state, snake => {
+        snake.timer--;
+        if (snake.timer <= 0) {
+            snake.fsm = SnakeFSM.Alive;
+            dispatcher.push(new Action.ADD_SNAKE(snake));
+        }
+    });
+
     forEachDespawningSnake(state, snake => {
         snake.timer--;
         if (snake.timer <= 0) {
             snake.fsm = SnakeFSM.Dead;
-            snake.timer = 0;
             dispatcher.push(new Action.ADD_SNAKE(snake));
         }
     });
 }
 
 export function snakeInputSystem(state: State, dispatcher: Action[]) {
-    forEachAliveSnake(state, snake => {
+    state.snakes.forEach(snake => {
         const { input, dir } = snake;
         if (input === Direction.up && dir === Direction.down) return;
         if (input === Direction.down && dir === Direction.up) return;
