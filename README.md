@@ -1,4 +1,11 @@
-# Multiplayer Snake
+## Getting Started
+
+Install dependencies and [Parcel](https://parceljs.org/) as the bundler
+```
+npm install
+npm i parcel -g
+npm i ts-node -g
+```
 
 ```
 npm run dev
