@@ -41,9 +41,15 @@ function login() {
             socket.emit("login", name);
         };
 
+        $input.value = localStorage.getItem("player-name") || "";
+        $input.click();
+        $btn.disabled = getPlayerNameErrors($input.value) !== undefined;
+        updateErrorMsg();
+
         socket.on("login-success", () => {
             if ($form.parentNode) {
                 $form.parentNode.removeChild($form);
+                localStorage.setItem("player-name", $input.value);
                 resolve($input.value);
             }
         });
